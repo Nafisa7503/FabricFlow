@@ -6,12 +6,13 @@ const transactionSchema = new mongoose.Schema({
         required: true,
     },
     category: {
-        type: String,
+        type: String,          //(Sales,Salary,Rent, Utility, Inventory, Others )
         required: true,
     },
     type: {
         type: String,
         required: true,
+        
     },
     amount: {
         type: Number,
@@ -20,12 +21,12 @@ const transactionSchema = new mongoose.Schema({
     payment_method: {
         type: String,
         required: true,
+        
     }
-},{
+}, {
     timestamps: true
-}
-);
+});
 
-const Transaction = mongoose.model("Transaction", transactionSchema); //Create a model Transaction from the schema transactionSchema
+const Transaction = mongoose.model("Transaction", transactionSchema);
 
 export default Transaction;

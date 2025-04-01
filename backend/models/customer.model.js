@@ -6,7 +6,7 @@ const customerSchema = new mongoose.Schema({
         required: true,
     },
     phone: {
-        type: Number,
+        type: String,
         required: true,
     },
     address: {
@@ -14,18 +14,14 @@ const customerSchema = new mongoose.Schema({
         required: true,
     },
     most_purchased: {
-        type: Number,
+        type: String,
         required: true,
     },
-    // DOB: {
-    //     type: String,
-    //     required: true,
-    // }
 },{
     timestamps: true
 }
 );
 
-const Transaction = mongoose.model("Transaction", transactionSchema); //Create a model Transaction from the schema transactionSchema
+const Customer = mongoose.model("Customer", customerSchema); //Create a model Transaction from the schema transactionSchema
 
 export default Customer;

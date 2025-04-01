@@ -6,7 +6,7 @@ import Order from "../models/order.model.js";
 
 export const createOrder =async (req,res) => {
     const order = req.body; //req.body is the data that is sent to the server
-    if (!order.order_date || !order.delivery_date || !order.order_status || !order.quantity || !order.total_amount || !order.paid_amount || !order.due_amount || !order.total_amount) {
+    if (!order.order_date || !order.delivery_date || !order.order_status || !order.quantity || !order.total_amount || !order.paid_amount || !order.due_amount || !order.total_amount || !order.customer_id || !order.product_id) {
         return res.status(400).json({success: false, message: "All fields are required"});
     }
 
@@ -14,13 +14,22 @@ export const createOrder =async (req,res) => {
 
     try {
         await newOrder.save();
-        res.status(201).json({success: true, message: "Product created successfully", order: newOrder});
-
+    
+        // Populate product and customer details
+        const populatedOrder = await Order.findById(newOrder._id)
+            .populate("product_id")  // Fetch product details
+            .populate("customer_id"); // Fetch customer details
+    
+        res.status(201).json({
+            success: true,
+            message: "Order created successfully",
+            order: populatedOrder
+        });
+    
     } catch (error) {
         console.log("Error: ", error.message);
         res.status(500).json({success: false, message: "Server error. Please try again."});
     }
-
 }
 
 

@@ -6,8 +6,9 @@ const productSchema = new mongoose.Schema({
         required: true,
     },
     fabric_type: {
-        type: String,
+        type: String,        //( Shirt, Suit, Punjabi,Sherwani )   if nafisa_shirt then +=1 nafisa shirt 1 
         required: true,
+        
     },
     color: {
         type: String,
@@ -20,6 +21,7 @@ const productSchema = new mongoose.Schema({
     quantity: {
         type: Number,
         required: true,
+        
     },
     price: {
         type: Number,
@@ -29,16 +31,16 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    supplier: {
-        type: String,
-        required: true,
-    },
+    // supplier_id: {
+    //     type: String,
+    //     required: true,
+    // },
     
    
-    timestamps: true
-}
+   
+},{ timestamps: true,}
 );
 
-const Order = mongoose.model("Order", orderSchema); //Create a model Transaction from the schema transactionSchema
+const Product = mongoose.model("Product", productSchema); //Create a model Transaction from the schema transactionSchema
 
-export default Order;
+export default Product;

@@ -9,18 +9,20 @@ const orderSchema = new mongoose.Schema({
         type: Date,
         required: true,
     },
-    // customer: {
-    //     type: String,
-    //     required: true,
-    // },
+    customer_id: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Customer",
+        required: true,
+    },
     order_status: {
         type: String,
         required: true,
     },
-    // product: {
-    //     type: String,
-    //     required: true,
-    // },
+    product_id: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Product",
+        required: true,
+    },
     quantity: {
         type: Number,
         required: true,
@@ -43,8 +45,8 @@ const orderSchema = new mongoose.Schema({
     },
     
    
-    timestamps: true
-}
+   
+},{ timestamps: true}
 );
 
 const Order = mongoose.model("Order", orderSchema); //Create a model Transaction from the schema transactionSchema

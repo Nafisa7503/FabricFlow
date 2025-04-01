@@ -1,23 +1,24 @@
 import mongoose from "mongoose";
 
-const notificationSchema = new mongoose.Schema({
-    date_time: {
-        type: Date,
+const financeSchema = new mongoose.Schema({
+    net_income: {
+        type: Number,
         required: true,
     },
-    customer: {
-        type: String,
+    net_expense: {
+        type: Number,
         required: true,
     },
-    // action: {
-    //     type: Number,
-    //     required: true,
-    // },
+    status: {
+        type: Number,
+        required: true,
+    },
     
     
    
-    timestamps: true
-}
+   
+},
+{ timestamps: true}
 );
 
 const Finance = mongoose.model("Finance", financeSchema); //Create a model Transaction from the schema transactionSchema

@@ -1,20 +1,20 @@
 import mongoose from "mongoose";
 
-import notification from "../models/finance.model.js";
+import Notification from "../models/notification.model.js";
 
 
 
 export const createNotification =async (req,res) => {
     const notification = req.body; //req.body is the data that is sent to the server
-    if (!notification.date_time || !notification.customer ) {
+    if (!notification.date_time || !notification.customer_id ) {
         return res.status(400).json({success: false, message: "All fields are required"});
     }
 
-    const newFinance= new Finance(finance)
+    const newNotification= new Notification(notification)
 
     try {
-        await newFinance.save();
-        res.status(201).json({success: true, message: "Product created successfully", finance: newFinance});
+        await newNotification.save();
+        res.status(201).json({success: true, message: "Product created successfully", notification: newNotification});
 
     } catch (error) {
         console.log("Error: ", error.message);

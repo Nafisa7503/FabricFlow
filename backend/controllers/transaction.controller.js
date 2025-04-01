@@ -4,7 +4,7 @@ import Transaction from "../models/transaction.model.js";
 
 
 
-export const createTransactions =async (req,res) => {
+export const createTransaction =async (req,res) => {
     const transaction = req.body; //req.body is the data that is sent to the server
     if (!transaction.description || !transaction.category || !transaction.type || !transaction.amount || !transaction.payment_method) {
         return res.status(400).json({success: false, message: "All fields are required"});
@@ -39,17 +39,17 @@ export const createTransactions =async (req,res) => {
 // }
 
 
-// export const getProducts = async (req,res) => {
+export const getTransactions = async (req,res) => {
 
-//     try {
-//         const products = await Product.find({});
-//         res.status(201).json({success: true, products: products});
+    try {
+        const transactions = await Transaction.find({});
+        res.status(201).json({success: true, transactions: transactions});
 
-//     } catch (error) {
-//         console.log("Error: ", error.message);
-//         res.status(404).json({success: false, message: "Error in fetching Products"}); 
-// }
-// }
+    } catch (error) {
+        console.log("Error: ", error.message);
+        res.status(404).json({success: false, message: "Error in fetching Products"}); 
+}
+}
 
 
 
