@@ -93,7 +93,7 @@ useEffect(() => {
   };
   
   const filteredTransactions = transactionsData.filter((transaction) =>
-    transaction?._id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    // transaction?._id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     transaction?.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     transaction?.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     transaction?.type?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -103,11 +103,11 @@ useEffect(() => {
   // Calculate totals
   const totalIncome = transactionsData
     .filter(t => t.type === 'Income')
-    .reduce((sum, t) => sum + t.amountValue, 0);
+    .reduce((sum, t) => sum + t.amount, 0);
     
   const totalExpense = transactionsData
     .filter(t => t.type === 'Expense')
-    .reduce((sum, t) => sum + t.amountValue, 0);
+    .reduce((sum, t) => sum + t.amount, 0);
     
   const netProfit = totalIncome - totalExpense;
   
@@ -219,7 +219,7 @@ useEffect(() => {
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
+                    {/* <th>ID</th> */}
                     <th>{t('transactionDate')}</th>
                     <th>{t('description')}</th>
                     <th>{t('category')}</th>
@@ -231,8 +231,8 @@ useEffect(() => {
                 <tbody>
                   {filteredTransactions.map((transaction) => (
                     <tr key={transaction.id}>
-                      <td className="font-medium text-tailoring-900">{transaction.id}</td>
-                      <td>{new Date(transaction.date).toLocaleDateString('en-US', { 
+                      {/* <td className="font-medium text-tailoring-900">{transaction.id}</td> */}
+                      <td>{new Date(transaction.createdAt).toLocaleDateString('en-US', { 
                         year: 'numeric', 
                         month: 'short', 
                         day: 'numeric' 
@@ -247,7 +247,7 @@ useEffect(() => {
                       <td className={transaction.type === 'Income' ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>
                         {transaction.amount}
                       </td>
-                      <td>{transaction.paymentMethod}</td>
+                      <td>{transaction.payment_method}</td>
                     </tr>
                   ))}
                 </tbody>
