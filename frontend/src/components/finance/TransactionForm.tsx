@@ -6,8 +6,8 @@ import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
-import { Calendar } from '@/components/ui/calendar';   //asgdgayudfaydg
-import { getTransactions} from "../../services/api";
+import { Calendar } from '@/components/ui/calendar';
+import { postTransactions} from "../../services/api";
 import {
   Popover,
   PopoverContent,
@@ -49,6 +49,15 @@ interface TransactionFormProps {
   onClose: () => void;
   onSubmit: (data: any) => void;
 }
+interface TransactionData {
+  date: string;
+  description: string;
+  category: string;
+  type: 'income' | 'expense'; // Use literal types for type safety
+  amount: number;
+  payment_method: 'cash' | 'card' | 'bankTransfer'; // Use literal types for payment methods
+}
+
 
 export const TransactionForm = ({ open, onClose, onSubmit }: TransactionFormProps) => {
   const { t } = useLanguage();
@@ -62,9 +71,9 @@ export const TransactionForm = ({ open, onClose, onSubmit }: TransactionFormProp
     paymentMethod: 'cash'
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+  
     if (!transactionDate || !formData.description || !formData.amount) {
       toast({
         variant: "destructive",
@@ -73,7 +82,7 @@ export const TransactionForm = ({ open, onClose, onSubmit }: TransactionFormProp
       });
       return;
     }
-
+  
     const amount = parseFloat(formData.amount);
     if (isNaN(amount) || amount <= 0) {
       toast({
@@ -83,30 +92,37 @@ export const TransactionForm = ({ open, onClose, onSubmit }: TransactionFormProp
       });
       return;
     }
-
+  
     const transactionData = {
-      // id: `TRX-${Math.floor(Math.random() * 900) + 100}`,
       date: transactionDate.toISOString().split('T')[0],
       description: formData.description,
       category: formData.category,
       type: formData.type,
-      // amount: `৳${amount.toLocaleString()}`,
       amount: amount,
       payment_method: formData.paymentMethod,
     };
+  
+    try {
+      // Call the postTransactions method to submit the form data
+      await postTransactions(transactionData);
+      
 
-    onSubmit(transactionData);
-    onClose();
-    
-    // Reset form
-    setFormData({
-      description: '',
-      category: 'sales',
-      type: 'income',
-      amount: '',
-      paymentMethod: 'cash'
-    });
-    setTransactionDate(new Date());
+  
+      onSubmit(transactionData);
+      onClose();
+  
+      // Reset form
+      setFormData({
+        description: '',
+        category: 'sales',
+        type: 'Income',
+        amount: '',
+        paymentMethod: 'cash'
+      });
+      setTransactionDate(new Date());
+    } catch (error) {
+
+    }
   };
 
   return (

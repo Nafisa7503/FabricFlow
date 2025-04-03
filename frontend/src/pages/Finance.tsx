@@ -84,13 +84,15 @@ useEffect(() => {
   fetchTransactions();
 }, []);
 
-  const handleAddTransaction = (newTransaction: any) => {
-    setTransactionsData([newTransaction, ...transactionsData]);
-    toast({
-      title: t('success'),
-      description: t('transactionAdded'),
-    });
-  };
+const handleAddTransaction = async (newTransaction: any) => {
+  try {
+    const data = await getTransactions();
+    console.log(data)
+    setTransactionsData(data.transactions);
+  } catch (error) {
+    console.error("Error fetching transactions:", error);
+  }
+};
   
   const filteredTransactions = transactionsData.filter((transaction) =>
     // transaction?._id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -102,11 +104,11 @@ useEffect(() => {
   
   // Calculate totals
   const totalIncome = transactionsData
-    .filter(t => t.type === 'Income')
+    .filter(t => t.type === 'income')
     .reduce((sum, t) => sum + t.amount, 0);
     
   const totalExpense = transactionsData
-    .filter(t => t.type === 'Expense')
+    .filter(t => t.type === 'expense')
     .reduce((sum, t) => sum + t.amount, 0);
     
   const netProfit = totalIncome - totalExpense;
