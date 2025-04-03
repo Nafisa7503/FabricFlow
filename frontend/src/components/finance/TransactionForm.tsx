@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
-import { addTransaction } from "../../services/api"; // Import POST method
+import { postTransactions} from "../../services/api";
 import {
   Popover,
   PopoverContent,
@@ -28,20 +29,40 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const TRANSACTION_CATEGORIES = ['sales', 'salary', 'rent', 'utilities', 'inventory', 'other'];
-const PAYMENT_METHODS = ['cash', 'card', 'bankTransfer'];
+const TRANSACTION_CATEGORIES = [
+  'sales',
+  'salary',
+  'rent',
+  'utilities',
+  'inventory',
+  'other'
+];
+
+const PAYMENT_METHODS = [
+  'cash',
+  'card',
+  'bankTransfer'
+];
 
 interface TransactionFormProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (data: any) => void;
 }
+interface TransactionData {
+  date: string;
+  description: string;
+  category: string;
+  type: 'income' | 'expense'; // Use literal types for type safety
+  amount: number;
+  payment_method: 'cash' | 'card' | 'bankTransfer'; // Use literal types for payment methods
+}
+
 
 export const TransactionForm = ({ open, onClose, onSubmit }: TransactionFormProps) => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [transactionDate, setTransactionDate] = useState<Date>(new Date());
-  const [loading, setLoading] = useState(false); // Loading state for submit button
   const [formData, setFormData] = useState({
     description: '',
     category: 'sales',
@@ -52,8 +73,7 @@ export const TransactionForm = ({ open, onClose, onSubmit }: TransactionFormProp
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Validation
+  
     if (!transactionDate || !formData.description || !formData.amount) {
       toast({
         variant: "destructive",
@@ -62,7 +82,7 @@ export const TransactionForm = ({ open, onClose, onSubmit }: TransactionFormProp
       });
       return;
     }
-
+  
     const amount = parseFloat(formData.amount);
     if (isNaN(amount) || amount <= 0) {
       toast({
@@ -72,8 +92,7 @@ export const TransactionForm = ({ open, onClose, onSubmit }: TransactionFormProp
       });
       return;
     }
-
-    // Construct transaction object
+  
     const transactionData = {
       date: transactionDate.toISOString().split('T')[0],
       description: formData.description,
@@ -82,28 +101,28 @@ export const TransactionForm = ({ open, onClose, onSubmit }: TransactionFormProp
       amount: amount,
       payment_method: formData.paymentMethod,
     };
-
-    // Send data to backend
-    setLoading(true);
+  
     try {
-      const response = await addTransaction(transactionData);
-      onSubmit(response); // Update parent state
-      toast({
-        title: t('success'),
-        description: t('transactionAdded'),
-      });
+      // Call the postTransactions method to submit the form data
+      await postTransactions(transactionData);
+      
+
+  
+      onSubmit(transactionData);
       onClose();
-      setFormData({ description: '', category: 'sales', type: 'income', amount: '', paymentMethod: 'cash' });
+  
+      // Reset form
+      setFormData({
+        description: '',
+        category: 'sales',
+        type: 'Income',
+        amount: '',
+        paymentMethod: 'cash'
+      });
       setTransactionDate(new Date());
     } catch (error) {
-      console.error("Error submitting transaction:", error);
-      toast({
-        variant: "destructive",
-        title: t('error'),
-        description: t('failedToAddTransaction'),
-      });
+
     }
-    setLoading(false);
   };
 
   return (
@@ -111,7 +130,9 @@ export const TransactionForm = ({ open, onClose, onSubmit }: TransactionFormProp
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
           <DialogTitle>{t('addNewTransaction')}</DialogTitle>
-          <DialogDescription>{t('addNewTransactionDesc')}</DialogDescription>
+          <DialogDescription>
+            {t('addNewTransactionDesc')}
+          </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
@@ -119,7 +140,10 @@ export const TransactionForm = ({ open, onClose, onSubmit }: TransactionFormProp
             <label className="text-sm font-medium text-gray-700 mb-1 block">{t('transactionDate')}</label>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start text-left font-normal">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal"
+                >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {transactionDate ? format(transactionDate, "PPP") : <span>{t('pickDate')}</span>}
                 </Button>
@@ -149,7 +173,10 @@ export const TransactionForm = ({ open, onClose, onSubmit }: TransactionFormProp
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1 block">{t('category')}</label>
-              <Select value={formData.category} onValueChange={(value) => setFormData({...formData, category: value})}>
+              <Select 
+                value={formData.category}
+                onValueChange={(value) => setFormData({...formData, category: value})}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder={t('selectCategory')} />
                 </SelectTrigger>
@@ -165,7 +192,10 @@ export const TransactionForm = ({ open, onClose, onSubmit }: TransactionFormProp
 
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1 block">{t('type')}</label>
-              <Select value={formData.type} onValueChange={(value) => setFormData({...formData, type: value})}>
+              <Select 
+                value={formData.type}
+                onValueChange={(value) => setFormData({...formData, type: value})}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -191,7 +221,10 @@ export const TransactionForm = ({ open, onClose, onSubmit }: TransactionFormProp
 
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1 block">{t('paymentMethod')}</label>
-              <Select value={formData.paymentMethod} onValueChange={(value) => setFormData({...formData, paymentMethod: value})}>
+              <Select 
+                value={formData.paymentMethod}
+                onValueChange={(value) => setFormData({...formData, paymentMethod: value})}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -207,9 +240,11 @@ export const TransactionForm = ({ open, onClose, onSubmit }: TransactionFormProp
           </div>
 
           <DialogFooter className="mt-6">
-            <Button type="button" variant="outline" onClick={onClose}>{t('cancel')}</Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? t('processing') : t('confirm')}
+            <Button type="button" variant="outline" onClick={onClose}>
+              {t('cancel')}
+            </Button>
+            <Button type="submit">
+              {t('confirm')}
             </Button>
           </DialogFooter>
         </form>
