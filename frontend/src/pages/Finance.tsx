@@ -1,9 +1,10 @@
 
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { getTransactions} from "../services/api";
 import { 
   Search, 
   Plus, 
@@ -24,88 +25,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Sample data for financial transactions
-const initialTransactionsData = [
-  { 
-    id: 'TRX-001', 
-    date: '2023-09-10',
-    description: 'Sales Revenue - ORD-001',
-    category: 'Sales',
-    type: 'Income',
-    amount: '৳12,500',
-    amountValue: 12500,
-    paymentMethod: 'Cash',
-  },
-  { 
-    id: 'TRX-002', 
-    date: '2023-09-09',
-    description: 'Fabric Purchase - Italian Wool',
-    category: 'Inventory',
-    type: 'Expense',
-    amount: '৳24,000',
-    amountValue: 24000,
-    paymentMethod: 'Bank Transfer',
-  },
-  { 
-    id: 'TRX-003', 
-    date: '2023-09-09',
-    description: 'Sales Revenue - ORD-002',
-    category: 'Sales',
-    type: 'Income',
-    amount: '৳4,200',
-    amountValue: 4200,
-    paymentMethod: 'Card',
-  },
-  { 
-    id: 'TRX-004', 
-    date: '2023-09-08',
-    description: 'Utility Bill - Electricity',
-    category: 'Utilities',
-    type: 'Expense',
-    amount: '৳5,800',
-    amountValue: 5800,
-    paymentMethod: 'Bank Transfer',
-  },
-  { 
-    id: 'TRX-005', 
-    date: '2023-09-08',
-    description: 'Employee Salary - Tailor (Karim)',
-    category: 'Salary',
-    type: 'Expense',
-    amount: '৳18,000',
-    amountValue: 18000,
-    paymentMethod: 'Cash',
-  },
-  { 
-    id: 'TRX-006', 
-    date: '2023-09-07',
-    description: 'Sales Revenue - ORD-004',
-    category: 'Sales',
-    type: 'Income',
-    amount: '৳1,800',
-    amountValue: 1800,
-    paymentMethod: 'Cash',
-  },
-  { 
-    id: 'TRX-007', 
-    date: '2023-09-06',
-    description: 'Shop Rent - September',
-    category: 'Rent',
-    type: 'Expense',
-    amount: '৳35,000',
-    amountValue: 35000,
-    paymentMethod: 'Bank Transfer',
-  },
-  { 
-    id: 'TRX-008', 
-    date: '2023-09-06',
-    description: 'Sales Revenue - ORD-005',
-    category: 'Sales',
-    type: 'Income',
-    amount: '৳9,500',
-    amountValue: 9500,
-    paymentMethod: 'Card',
-  },
-];
+
+
 
 // Sample data for pie chart
 const pieChartData = [
@@ -146,8 +67,23 @@ const Finance = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddingTransaction, setIsAddingTransaction] = useState(false);
-  const [transactionsData, setTransactionsData] = useState(initialTransactionsData);
-  
+  // const [transactionsData, setTransactionsData] = useState(initialTransactionsData);
+  const [transactionsData, setTransactionsData] = useState([]);
+
+useEffect(() => {
+  const fetchTransactions = async () => {
+    try {
+      const data = await getTransactions();
+      console.log(data)
+      setTransactionsData(data["transactions"]);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+    }
+  };
+
+  fetchTransactions();
+}, []);
+
   const handleAddTransaction = (newTransaction: any) => {
     setTransactionsData([newTransaction, ...transactionsData]);
     toast({
