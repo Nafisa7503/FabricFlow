@@ -23,6 +23,18 @@ export const createCustomer =async (req,res) => {
 
 }
 
+export const getCustomer = async (req,res) => {
+
+    try {
+        const customer = await Customer.find({});
+        res.status(201).json({success: true, customer: customer});
+
+    } catch (error) {
+        console.log("Error: ", error.message);
+        res.status(404).json({success: false, message: "Error in fetching Products"}); 
+}
+}
+
 
 // export const deleteProducts = async (req,res) => {
 //     const {id} = req.params;

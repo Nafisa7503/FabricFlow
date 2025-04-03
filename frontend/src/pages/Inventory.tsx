@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Search, Plus, Filter, RefreshCcw, Package, Box, Shirt, Scissors, Tag } from 'lucide-react';
 import { InventoryForm } from '@/components/inventory/InventoryForm';
 import { useToast } from '@/hooks/use-toast';
-
+import { getProducts} from "../services/api";
 // Sample data for fabrics inventory with updated fields
 const initialFabricsData = [
   {
@@ -66,9 +66,24 @@ const Inventory = () => {
   const { toast } = useToast();
   const [fabricCodeSearch, setFabricCodeSearch] = useState('');
   const [isAddingFabric, setIsAddingFabric] = useState(false);
-  const [fabricsData, setFabricsData] = useState(initialFabricsData);
+  // const [fabricsData, setFabricsData] = useState(initialFabricsData);
   const [isEditingFabric, setIsEditingFabric] = useState<string | null>(null);
+  const [fabricsData, setFabricsData] = useState([]);
   
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getProducts();
+        console.log(data)
+        setFabricsData(data.products);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+  
+    fetchProducts();
+  }, []);
+
   const handleAddFabric = (newFabric: typeof initialFabricsData[0]) => {
     // Generating a new fabric ID 
     const newId = `FB-${String(fabricsData.length + 1).padStart(3, '0')}`;
@@ -121,10 +136,12 @@ const Inventory = () => {
     });
   };
   
-  const filteredFabrics = fabricsData.filter(fabric => 
-    fabric.id.toLowerCase().includes(fabricCodeSearch.toLowerCase()) ||
-    fabric.name.toLowerCase().includes(fabricCodeSearch.toLowerCase()) ||
-    fabric.type.toLowerCase().includes(fabricCodeSearch.toLowerCase())
+  const filteredFabrics = fabricsData.filter((fabric) => 
+    // fabric.id.toLowerCase().includes(fabricCodeSearch.toLowerCase()) ||
+    fabric.fabric_name.toLowerCase().includes(fabricCodeSearch.toLowerCase()) ||
+    fabric.fabric_type.toLowerCase().includes(fabricCodeSearch.toLowerCase())
+    
+    
   );
   
   return (
@@ -191,7 +208,7 @@ const Inventory = () => {
                 <table className="data-table">
                   <thead>
                     <tr>
-                      <th>ID</th>
+                      {/* <th>ID</th> */}
                       <th>{t('fabricName')}</th>
                       <th>{t('fabricType')}</th>
                       <th>{t('available')}</th>
@@ -203,9 +220,9 @@ const Inventory = () => {
                   <tbody>
                     {filteredFabrics.map((fabric) => (
                       <tr key={fabric.id}>
-                        <td className="font-medium text-tailoring-900">{fabric.id}</td>
-                        <td>{fabric.name}</td>
-                        <td>{fabric.type}</td>
+                        {/* <td className="font-medium text-tailoring-900">{fabric.id}</td> */}
+                        <td>{fabric.fabric_name}</td>
+                        <td>{fabric.fabric_type}</td>
                         <td>{fabric.available} {t('pieces')}</td>
                         <td>৳{fabric.buyingPrice}</td>
                         <td>৳{fabric.sellingPrice}</td>
