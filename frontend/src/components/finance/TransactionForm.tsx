@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
+import { getTransactions} from "../../services/api";
 import {
   Popover,
   PopoverContent,
@@ -84,14 +85,14 @@ export const TransactionForm = ({ open, onClose, onSubmit }: TransactionFormProp
     }
 
     const transactionData = {
-      id: `TRX-${Math.floor(Math.random() * 900) + 100}`,
+      // id: `TRX-${Math.floor(Math.random() * 900) + 100}`,
       date: transactionDate.toISOString().split('T')[0],
       description: formData.description,
       category: formData.category,
       type: formData.type,
-      amount: `৳${amount.toLocaleString()}`,
-      amountValue: amount,
-      paymentMethod: formData.paymentMethod,
+      // amount: `৳${amount.toLocaleString()}`,
+      amount: amount,
+      payment_method: formData.paymentMethod,
     };
 
     onSubmit(transactionData);
