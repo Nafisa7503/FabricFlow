@@ -6,6 +6,6 @@ export const getTransactions = async () => {
       method: "GET",
     });
     const data = await response.json();
-    return data.results;
+    return data;
   };
   

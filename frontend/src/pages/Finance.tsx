@@ -75,7 +75,7 @@ useEffect(() => {
     try {
       const data = await getTransactions();
       console.log(data)
-      setTransactionsData(data["transactions"]);
+      setTransactionsData(data.transactions);
     } catch (error) {
       console.error("Error fetching transactions:", error);
     }
@@ -92,12 +92,13 @@ useEffect(() => {
     });
   };
   
-  const filteredTransactions = transactionsData.filter(transaction => 
-    transaction.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    transaction.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    transaction.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    transaction.type.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredTransactions = transactionsData.filter((transaction) =>
+    transaction?._id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    transaction?.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    transaction?.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    transaction?.type?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  
   
   // Calculate totals
   const totalIncome = transactionsData
