@@ -56,8 +56,8 @@ export const InventoryForm = ({ open, onClose, onSubmit }: InventoryFormProps) =
     // Create new fabric entry
     const fabricData = {
       // id: `FB-${Math.floor(Math.random() * 900) + 100}`,
-      name: formData.name,
-      type: formData.type,
+      fabric_name: formData.name,
+      fabric_type: formData.type,
       color: formData.color,
       pattern: formData.pattern || 'Solid',
       quantity: formData.available, 
