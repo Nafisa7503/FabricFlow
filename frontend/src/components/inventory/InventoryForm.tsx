@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { postProducts} from "../../services/api";
 import {
   Dialog,
   DialogContent,
@@ -40,7 +41,7 @@ export const InventoryForm = ({ open, onClose, onSubmit }: InventoryFormProps) =
     supplier: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name || !formData.color || !formData.available || !formData.price) {
@@ -54,22 +55,28 @@ export const InventoryForm = ({ open, onClose, onSubmit }: InventoryFormProps) =
 
     // Create new fabric entry
     const fabricData = {
-      id: `FB-${Math.floor(Math.random() * 900) + 100}`,
+      // id: `FB-${Math.floor(Math.random() * 900) + 100}`,
       name: formData.name,
       type: formData.type,
       color: formData.color,
       pattern: formData.pattern || 'Solid',
-      available: `${formData.available} meters`,
-      price: `৳${formData.price}/meter`,
+      quantity: formData.available, 
+      price: formData.price,
       quality: formData.quality,
-      supplier: formData.supplier || 'Local Supplier',
+      // supplier: formData.supplier || 'Local Supplier',
     };
 
     // Submit the data
-    onSubmit(fabricData);
-    
-    // Reset form
-    setFormData({
+    try {
+      // Call the postTransactions method to submit the form data
+      await postProducts(fabricData);
+      
+
+  
+      onSubmit(fabricData);
+      onClose();
+  
+      setFormData({
       name: '',
       type: 'Shirting',
       color: '',
@@ -78,16 +85,10 @@ export const InventoryForm = ({ open, onClose, onSubmit }: InventoryFormProps) =
       price: '',
       quality: 'Standard',
       supplier: '',
-    });
-    
-    // Close the dialog
-    onClose();
+    }); 
+    } catch (error) {
 
-    // Show success message
-    toast({
-      title: t('success'),
-      description: t('fabricAdded'),
-    });
+    }
   };
 
   return (

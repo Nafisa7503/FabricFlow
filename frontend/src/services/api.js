@@ -49,6 +49,8 @@ export const getTransactions = async () => {
 
   export const postProducts = async (productData) => {
     try {
+      console.log("This works")
+      console.log(productData)
       const response = await fetch(`${BASE_URL}/product`, {
         method: "POST",
         headers: {
@@ -56,7 +58,7 @@ export const getTransactions = async () => {
         },
         body: JSON.stringify(productData), // Send the transaction data in the request body
       });
-  
+      console.log(response)
       if (!response.ok) {
         // If the response is not okay (status code outside 2xx range)
         throw new Error("Failed to submit transaction");

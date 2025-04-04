@@ -84,21 +84,14 @@ const Inventory = () => {
     fetchProducts();
   }, []);
 
-  const handleAddFabric = (newFabric: typeof initialFabricsData[0]) => {
-    // Generating a new fabric ID 
-    const newId = `FB-${String(fabricsData.length + 1).padStart(3, '0')}`;
-    const fabricWithId = {
-      ...newFabric,
-      id: newId,
-      sellingPrice: newFabric.buyingPrice * 1.2 // Default markup of 20%
-    };
-    setFabricsData([fabricWithId, ...fabricsData]);
-    setIsAddingFabric(false);
-    
-    toast({
-      title: t('success'),
-      description: `${t('fabric')} ${newId} ${t('addedSuccessfully')}`,
-    });
+  const handleAddFabric = async (newFabric: typeof initialFabricsData[0]) => {
+    try {
+      const data = await getProducts();
+      console.log(data)
+      setFabricsData(data.products);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+    }
   };
 
   const handleEditFabric = (fabricId: string) => {
@@ -209,12 +202,16 @@ const Inventory = () => {
                   <thead>
                     <tr>
                       {/* <th>ID</th> */}
-                      <th>{t('fabricName')}</th>
-                      <th>{t('fabricType')}</th>
-                      <th>{t('available')}</th>
-                      <th>{t('buyingPrice')}</th>
-                      <th>{t('sellingPrice')}</th>
-                      <th>{t('actions')}</th>
+                      <th>{('Name')}</th>
+                      <th>{('Type')}</th>
+                      <th>{('Color')}</th>
+                      <th>{('Pattern')}</th>
+                      <th>{('Quantity')}</th>
+                      <th>{('Price')}</th>
+                      <th>{('Quality')}</th>
+                      {/* <th>{('Supplier')}</th> */}
+                      <th>{('Actions')}</th>
+                      
                     </tr>
                   </thead>
                   <tbody>
@@ -223,9 +220,11 @@ const Inventory = () => {
                         {/* <td className="font-medium text-tailoring-900">{fabric.id}</td> */}
                         <td>{fabric.fabric_name}</td>
                         <td>{fabric.fabric_type}</td>
-                        <td>{fabric.available} {t('pieces')}</td>
-                        <td>৳{fabric.buyingPrice}</td>
-                        <td>৳{fabric.sellingPrice}</td>
+                        <td>{fabric.color}</td>
+                        <td>{fabric.pattern}</td>
+                        <td>{fabric.quantity} {t('pieces')}</td>
+                        <td>৳{fabric.price}</td>
+                        <td>{fabric.quality}</td>
                         <td>
                           <div className="flex gap-2">
                             <Button 
