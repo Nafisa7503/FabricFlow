@@ -71,3 +71,37 @@ export const getTransactions = async () => {
       throw error; // Rethrow the error to be caught in the form submission handler
     }
   }; 
+
+  //CUSTOMER APIs
+  export const getCustomers = async () => {
+    const response = await fetch(`${BASE_URL}/customer`, {
+      method: "GET",
+    });
+    const data = await response.json();
+    return data;
+  };
+
+  export const postCustomers = async (customerData) => {
+    try {
+      console.log("This works")
+      console.log(customerData)
+      const response = await fetch(`${BASE_URL}/customer`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // Make sure to set content type
+        },
+        body: JSON.stringify(customerData), // Send the transaction data in the request body
+      });
+      console.log(response)
+      if (!response.ok) {
+        // If the response is not okay (status code outside 2xx range)
+        throw new Error("Failed to submit transaction");
+      }
+  
+      const data = await response.json();
+      return data; // Return the response data if successful
+    } catch (error) {
+      console.error("Error posting transaction:", error);
+      throw error; // Rethrow the error to be caught in the form submission handler
+    }
+  }; 

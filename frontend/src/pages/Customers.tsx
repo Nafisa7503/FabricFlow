@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { Search, Plus, Filter, Phone, Mail, MapPin, Clock, ExternalLink } from '
 import { CustomerForm } from '@/components/customers/CustomerForm';
 import { CustomerDetail } from '@/components/customers/CustomerDetail';
 import { openWhatsApp, getBirthdayMessage, getSpecialOfferMessage } from '@/utils/whatsappUtils';
+import { getCustomers} from "../services/api";
 
 // Sample data for customers
 const initialCustomersData = [
@@ -162,11 +163,25 @@ const Customers = () => {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
-  const [customersData, setCustomersData] = useState(initialCustomersData);
+  // const [customersData, setCustomersData] = useState(initialCustomersData);
   const [isAddingCustomer, setIsAddingCustomer] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<typeof initialCustomersData[0] | null>(null);
   const { toast } = useToast();
+ const [customersData, setCustomersData] = useState([]);
 
+useEffect(() => {
+  const fetchCustomers = async () => {
+    try {
+      const data = await getCustomers();
+      console.log(data)
+      setCustomersData(data.customer);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+    }
+  };
+
+  fetchCustomers();
+}, []);
   const handleAddCustomer = (newCustomer: typeof initialCustomersData[0]) => {
     setCustomersData([newCustomer, ...customersData]);
   };
