@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { postCustomers} from "../../services/api";
 import {
   Dialog,
   DialogContent,
@@ -31,7 +32,7 @@ export const CustomerForm = ({ open, onClose, onSubmit }: CustomerFormProps) => 
     favoriteProducts: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name || !formData.phone) {
@@ -53,29 +54,30 @@ export const CustomerForm = ({ open, onClose, onSubmit }: CustomerFormProps) => 
       lastPurchase: new Date().toISOString().split('T')[0],
       totalOrders: 0,
       totalSpent: '৳0',
-      favorite: formData.favoriteProducts || 'Not specified',
+      most_purchased: formData.favoriteProducts || 'Not specified',
     };
 
     // Submit the data
-    onSubmit(customerData);
-    
-    // Reset form
+    try {
+      // Call the postTransactions method to submit the form data
+      await postCustomers(customerData);
+      
+
+  
+      onSubmit(customerData);
+      onClose();
+  
     setFormData({
       name: '',
       phone: '',
       email: '',
       address: '',
       favoriteProducts: '',
-    });
-    
-    // Close the dialog
-    onClose();
+    }); 
+    } catch (error) {
 
-    // Show success message
-    toast({
-      title: t('success'),
-      description: t('customerAdded'),
-    });
+    };
+
   };
 
   return (

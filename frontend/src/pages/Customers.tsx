@@ -182,8 +182,14 @@ useEffect(() => {
 
   fetchCustomers();
 }, []);
-  const handleAddCustomer = (newCustomer: typeof initialCustomersData[0]) => {
-    setCustomersData([newCustomer, ...customersData]);
+  const handleAddCustomer = async (newCustomer: typeof initialCustomersData[0]) => {
+    try {
+      const data = await getCustomers();
+      console.log(data)
+      setCustomersData(data.customer);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+    }
   };
 
   const handleViewProfile = (customer: typeof initialCustomersData[0]) => {
