@@ -1,27 +1,43 @@
 import mongoose from "mongoose";
 
 import Customer from "../models/customer.model.js";
+import Counter from "../models/counter.model.js";
 
 
 
-export const createCustomer =async (req,res) => {
-    const customer = req.body; //req.body is the data that is sent to the server
-    if (!customer.customer_id || !customer.name || !customer.phone || !customer.address || !customer.most_purchased ) {
-        return res.status(400).json({success: false, message: "All fields are required"});
+export const createCustomer = async (req, res) => {
+    const customer = req.body;
+  
+    if (!customer.name || !customer.phone || !customer.address || !customer.most_purchased) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
     }
-
-    const newCustomer= new Customer(customer)
-
+  
     try {
-        await newCustomer.save();
-        res.status(201).json({success: true, message: "Product created successfully", customer: newCustomer});
-
+      // Get and increment the sequence value
+      const counter = await Counter.findOneAndUpdate(
+        { name: "customer_id" },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true } // upsert creates the doc if it doesn't exist
+      );
+  
+      const newCustomer = new Customer({
+        ...customer,
+        customer_id: `CUS-${counter.seq}`,
+      });
+  
+      await newCustomer.save();
+  
+      res.status(201).json({
+        success: true,
+        message: "Customer created successfully",
+        customer: newCustomer,
+      });
     } catch (error) {
-        console.log("Error: ", error.message);
-        res.status(500).json({success: false, message: "Server error. Please try again."});
+      console.log("Error: ", error.message);
+      res.status(500).json({ success: false, message: "Server error. Please try again." });
     }
-
-}
+  };
+  
 
 export const getCustomer = async (req,res) => {
 
