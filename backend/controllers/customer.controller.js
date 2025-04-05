@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 import Customer from "../models/customer.model.js";
 import Counter from "../models/counter.model.js";
+import { getNextSequence } from "../utils/getNextSequence.js";
 
 
 
@@ -14,18 +15,11 @@ export const createCustomer = async (req, res) => {
   
     try {
       // Get and increment the sequence value
-      const counter = await Counter.findOneAndUpdate(
-        { name: "customer_id" },
-        { $inc: { seq: 1 } },
-        { new: true, upsert: true } // upsert creates the doc if it doesn't exist
-      );
-  
-      const newCustomer = new Customer({
-        ...customer,
-        customer_id: `CUS-${counter.seq}`,
-      });
-  
-      await newCustomer.save();
+      const nextId = await getNextSequence("customer");
+    customer.customer_id = `CUS-${nextId}`;
+
+    const newCustomer = new Customer(customer);
+    await newCustomer.save();
   
       res.status(201).json({
         success: true,

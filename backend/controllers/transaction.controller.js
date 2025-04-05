@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 import Transaction from "../models/transaction.model.js";
+import { getNextSequence } from "../utils/getNextSequence.js";
 
 
 
@@ -10,9 +11,12 @@ export const createTransaction =async (req,res) => {
         return res.status(400).json({success: false, message: "All fields are required"});
     }
 
-    const newTransaction= new Transaction(transaction)
+    
 
     try {
+        const nextId = await getNextSequence("customer");
+        transaction.transaction_id = `TR-${nextId}`;
+        const newTransaction= new Transaction(transaction)
         await newTransaction.save();
         res.status(201).json({success: true, message: "Product created successfully", transaction: newTransaction});
 

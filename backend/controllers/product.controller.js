@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 
 import Product from "../models/product.model.js";
+import { getNextSequence } from "../utils/getNextSequence.js";
+
 
 
 
@@ -10,9 +12,12 @@ export const createProduct =async (req,res) => {
         return res.status(400).json({success: false, message: "All fields are required"});
     }
 
-    const newProduct= new Product(product)
+    
 
     try {
+        const nextId = await getNextSequence("customer");
+        product.fabric_id = `FB-${nextId}`;
+        const newProduct= new Product(product)
         await newProduct.save();
         res.status(201).json({success: true, message: "Product created successfully", product: newProduct});
 

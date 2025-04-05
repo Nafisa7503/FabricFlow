@@ -201,7 +201,7 @@ const Inventory = () => {
                 <table className="data-table">
                   <thead>
                     <tr>
-                      {/* <th>ID</th> */}
+                      <th>ID</th>
                       <th>{('Name')}</th>
                       <th>{('Type')}</th>
                       <th>{('Color')}</th>
@@ -217,7 +217,7 @@ const Inventory = () => {
                   <tbody>
                     {filteredFabrics.map((fabric) => (
                       <tr key={fabric.id}>
-                        {/* <td className="font-medium text-tailoring-900">{fabric.id}</td> */}
+                        <td className="font-medium text-tailoring-900">{fabric.fabric_id}</td>
                         <td>{fabric.fabric_name}</td>
                         <td>{fabric.fabric_type}</td>
                         <td>{fabric.color}</td>

@@ -221,7 +221,7 @@ const handleAddTransaction = async (newTransaction: any) => {
               <table className="data-table">
                 <thead>
                   <tr>
-                    {/* <th>ID</th> */}
+                    <th>ID</th>
                     <th>{t('transactionDate')}</th>
                     <th>{t('description')}</th>
                     <th>{t('category')}</th>
@@ -233,7 +233,7 @@ const handleAddTransaction = async (newTransaction: any) => {
                 <tbody>
                   {filteredTransactions.map((transaction) => (
                     <tr key={transaction.id}>
-                      {/* <td className="font-medium text-tailoring-900">{transaction.id}</td> */}
+                      <td className="font-medium text-tailoring-900">{transaction.transaction_id}</td>
                       <td>{new Date(transaction.createdAt).toLocaleDateString('en-US', { 
                         year: 'numeric', 
                         month: 'short', 
