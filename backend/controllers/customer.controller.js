@@ -6,7 +6,7 @@ import Customer from "../models/customer.model.js";
 
 export const createCustomer =async (req,res) => {
     const customer = req.body; //req.body is the data that is sent to the server
-    if (!customer.name || !customer.phone || !customer.address || !customer.most_purchased ) {
+    if (!customer.customer_id || !customer.name || !customer.phone || !customer.address || !customer.most_purchased ) {
         return res.status(400).json({success: false, message: "All fields are required"});
     }
 

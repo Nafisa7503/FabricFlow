@@ -46,7 +46,7 @@ export const CustomerForm = ({ open, onClose, onSubmit }: CustomerFormProps) => 
 
     // Create new customer data
     const customerData = {
-      id: `CUS-${Math.floor(Math.random() * 900) + 100}`,
+      customer_id: `CUS-${Math.floor(Math.random() * 900) + 100}`,
       name: formData.name,
       phone: formData.phone,
       email: formData.email || 'Not provided',

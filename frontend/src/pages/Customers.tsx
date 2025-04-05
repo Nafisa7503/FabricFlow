@@ -291,8 +291,8 @@ useEffect(() => {
               </thead>
               <tbody>
                 {filteredCustomers.map((customer) => (
-                  <tr key={customer.id}>
-                    <td className="font-medium text-tailoring-900">{customer.id}</td>
+                  <tr key={customer._id}>
+                    <td className="font-medium text-tailoring-900">{customer.customer_id}</td>
                     <td>{customer.name}</td>
                     <td className="text-sm">
                       <div>{customer.phone}</div>
