@@ -93,7 +93,7 @@ const Orders = () => {
       try {
         const data = await getOrders();
         console.log(data)
-        setOrdersData(data.transactions);
+        setOrdersData(data.order);
       } catch (error) {
         console.error("Error fetching transactions:", error);
       }
@@ -198,10 +198,7 @@ const Orders = () => {
           />
         )}
         
-        <OrderList 
-          orders={mapLegacyOrdersToNewFormat(displayedOrders)}
-          viewType={viewType}
-        />
+        <OrderList orders={ordersData} viewType={viewType} />;
       </main>
     </div>
   );

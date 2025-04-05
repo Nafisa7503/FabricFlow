@@ -9,7 +9,7 @@ export const mapLegacyOrdersToNewFormat = (legacyOrders: any[]): Order[] => {
       name: order.customerName,
       phone: order.phone
     },
-    productType: order.productType.toLowerCase(),
+    productType: order.product_id.fabric_type.toLowerCase(),
     orderDate: order.orderDate,
     deliveryDate: order.deliveryDate,
     status: order.status as any,
