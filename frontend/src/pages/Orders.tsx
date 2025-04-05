@@ -13,6 +13,7 @@ import { mapLegacyOrdersToNewFormat } from '@/utils/orderUtils';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Order } from '@/types/orderTypes';
+import { getOrders} from "../services/api";
 
 const initialOrdersData = [
   {
@@ -83,8 +84,23 @@ const Orders = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
   const [isAddingOrder, setIsAddingOrder] = useState(false);
-  const [ordersData, setOrdersData] = useState(initialOrdersData);
+  // const [ordersData, setOrdersData] = useState(initialOrdersData);
   const [activeTab, setActiveTab] = useState('all');
+  const [ordersData, setOrdersData] = useState([]);
+  
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const data = await getOrders();
+        console.log(data)
+        setOrdersData(data.orders);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+  
+    fetchOrders();
+  }, []);
   
   const mappedOrders = mapLegacyOrdersToNewFormat(ordersData);
   
@@ -105,10 +121,10 @@ const Orders = () => {
   
   // Fixed filtering to safely handle potentially undefined values
   const filteredOrders = ordersData.filter(order => {
-    const customerName = order.customerName || '';
-    const phone = order.phone || '';
-    const productType = order.productType || '';
-    const id = order.id || '';
+    const customerName = order.customer_id.name || '';
+    const phone = order.customer_id.phone || '';
+    const productType = order.product_id.fabric_type || '';
+    const id = order.order_id || '';
     const query = searchQuery.toLowerCase();
     
     return customerName.toLowerCase().includes(query) ||
@@ -127,7 +143,7 @@ const Orders = () => {
       'delivered': 'Delivered'
     };
     
-    return orders.filter(order => order.status === statusMap[activeTab]);
+    return orders.filter(order => order.order_status === statusMap[activeTab]);
   };
   
   const displayedOrders = filterOrdersByStatus(filteredOrders);
@@ -135,10 +151,10 @@ const Orders = () => {
   // Calculate status counts for the tabs
   const getStatusCounts = () => {
     const all = filteredOrders.length;
-    const new_orders = filteredOrders.filter(order => order.status === 'Order Taken').length;
-    const factory = filteredOrders.filter(order => order.status === 'Sent to Factory').length;
-    const ready = filteredOrders.filter(order => order.status === 'Ready for Pickup').length;
-    const delivered = filteredOrders.filter(order => order.status === 'Delivered').length;
+    const new_orders = filteredOrders.filter(order => order.order_status === 'Order Taken').length;
+    const factory = filteredOrders.filter(order => order.order_status === 'Sent to Factory').length;
+    const ready = filteredOrders.filter(order => order.order_status === 'Ready for Pickup').length;
+    const delivered = filteredOrders.filter(order => order.order_status === 'Delivered').length;
     
     return {
       all,

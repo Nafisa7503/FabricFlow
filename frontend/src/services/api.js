@@ -121,7 +121,7 @@ export const getTransactions = async () => {
     try {
       console.log("This works")
       console.log(orderData)
-      const response = await fetch(`${BASE_URL}/customer`, {
+      const response = await fetch(`${BASE_URL}/order`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json", // Make sure to set content type

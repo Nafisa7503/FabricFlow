@@ -51,18 +51,19 @@ export const createOrder =async (req,res) => {
 // }
 
 
-// export const getProducts = async (req,res) => {
 
-//     try {
-//         const products = await Product.find({});
-//         res.status(201).json({success: true, products: products});
+export const getOrders = async (req, res) => {
+    try {
+        const orders = await Order.find({})
+            .populate("product_id")  // Fetch product details
+            .populate("customer_id"); // Fetch customer details
 
-//     } catch (error) {
-//         console.log("Error: ", error.message);
-//         res.status(404).json({success: false, message: "Error in fetching Products"}); 
-// }
-// }
-
+        res.status(200).json({ success: true, orders: orders });
+    } catch (error) {
+        console.log("Error: ", error.message);
+        res.status(500).json({ success: false, message: "Error in fetching Orders" });
+    }
+};
 
 
 // export const updateProducts = async (req,res) => { //put is used to update all the data, patch is used to update some data
