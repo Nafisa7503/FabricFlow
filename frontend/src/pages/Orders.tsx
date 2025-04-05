@@ -13,6 +13,7 @@ import { mapLegacyOrdersToNewFormat } from '@/utils/orderUtils';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Order } from '@/types/orderTypes';
+import { getOrders} from "../services/api";
 
 const initialOrdersData = [
   {
@@ -83,11 +84,23 @@ const Orders = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
   const [isAddingOrder, setIsAddingOrder] = useState(false);
-  const [ordersData, setOrdersData] = useState(initialOrdersData);
+  // const [ordersData, setOrdersData] = useState(initialOrdersData);
   const [activeTab, setActiveTab] = useState('all');
-  
+  const [ordersData, setOrdersData] = useState([]);
   const mappedOrders = mapLegacyOrdersToNewFormat(ordersData);
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const data = await getOrders();
+        console.log(data)
+        setOrdersData(data.transactions);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
   
+    fetchOrders();
+  }, []);
   const handleAddOrder = (newOrder: any) => {
     setOrdersData([
       {

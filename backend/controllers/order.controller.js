@@ -48,17 +48,19 @@ export const createOrder =async (req,res) => {
 // }
 
 
-// export const getProducts = async (req,res) => {
+export const getOrder = async (req,res) => {
 
-//     try {
-//         const products = await Product.find({});
-//         res.status(201).json({success: true, products: products});
+    try {
+        const orders = await Order.find({})
+        .populate("product_id")  // Fetch product details
+        .populate("customer_id"); // Fetch customer details;
+        res.status(201).json({success: true, order: orders});
 
-//     } catch (error) {
-//         console.log("Error: ", error.message);
-//         res.status(404).json({success: false, message: "Error in fetching Products"}); 
-// }
-// }
+    } catch (error) {
+        console.log("Error: ", error.message);
+        res.status(404).json({success: false, message: "Error in fetching Products"}); 
+}
+}
 
 
 
