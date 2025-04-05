@@ -14,7 +14,7 @@ export const createTransaction =async (req,res) => {
     
 
     try {
-        const nextId = await getNextSequence("customer");
+        const nextId = await getNextSequence("transaction");
         transaction.transaction_id = `TR-${nextId}`;
         const newTransaction= new Transaction(transaction)
         await newTransaction.save();

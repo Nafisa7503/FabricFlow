@@ -10,9 +10,12 @@ export const createOrder =async (req,res) => {
         return res.status(400).json({success: false, message: "All fields are required"});
     }
 
-    const newOrder= new Order(order)
+    
 
     try {
+        const nextId = await getNextSequence("order");
+        order.order_id = `ORD-${nextId}`;
+        const newOrder= new Order(order)
         await newOrder.save();
     
         // Populate product and customer details

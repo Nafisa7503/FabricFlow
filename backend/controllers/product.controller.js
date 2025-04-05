@@ -15,7 +15,7 @@ export const createProduct =async (req,res) => {
     
 
     try {
-        const nextId = await getNextSequence("customer");
+        const nextId = await getNextSequence("product");
         product.fabric_id = `FB-${nextId}`;
         const newProduct= new Product(product)
         await newProduct.save();
