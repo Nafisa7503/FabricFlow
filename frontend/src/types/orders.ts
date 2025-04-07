@@ -13,7 +13,7 @@ export type ProductType = {
 export type OrderPayment = {
   totalAmount: number;
   paidAmount: number;
-  pendingAmount: number;
+  dueAmount: number;
 };
 
 export type Order = {

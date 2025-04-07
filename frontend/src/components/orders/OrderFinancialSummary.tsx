@@ -12,7 +12,7 @@ const OrderFinancialSummary = ({ orders }: OrderFinancialSummaryProps) => {
     (summary, order) => {
       summary.totalValue += order.payment.totalAmount;
       summary.totalPaid += order.payment.paidAmount;
-      summary.totalPending += order.payment.pendingAmount;
+      summary.totalPending += order.payment.totalAmount - order.payment.paidAmount;
       return summary;
     },
     { totalValue: 0, totalPaid: 0, totalPending: 0 }
