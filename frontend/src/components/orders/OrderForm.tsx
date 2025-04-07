@@ -8,6 +8,7 @@ import { OrderStatus, ProductType } from '@/types/orderTypes';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
+import { getProducts} from "../../services/api";
 import {
   Popover,
   PopoverContent,
@@ -49,23 +50,31 @@ const PRODUCT_TYPES = [
 ];
 
 // Sample fabric data (to be replaced with actual data from database)
-const FABRIC_SAMPLES = [
-  { code: 'FB-001', name: 'Premium Cotton', type: 'Shirting', stock: 15, buyingPrice: 850, sellingPrice: 1000 },
-  { code: 'FB-002', name: 'Italian Wool', type: 'Suiting', stock: 8, buyingPrice: 2400, sellingPrice: 2800 },
-  { code: 'FB-003', name: 'Linen Blend', type: 'Panjabi', stock: 12, buyingPrice: 1200, sellingPrice: 1400 },
-];
+// const FABRIC_SAMPLES = [
+//   { code: 'FB-001', name: 'Premium Cotton', type: 'Shirting', stock: 15, buyingPrice: 850, sellingPrice: 1000 },
+//   { code: 'FB-002', name: 'Italian Wool', type: 'Suiting', stock: 8, buyingPrice: 2400, sellingPrice: 2800 },
+//   { code: 'FB-003', name: 'Linen Blend', type: 'Panjabi', stock: 12, buyingPrice: 1200, sellingPrice: 1400 },
+// ];
 
 interface OrderFormProps {
   onSubmit: (data: any) => void;
 }
 
+// interface ProductOrder {
+//   productType: string;
+//   quantity: number;
+//   measurements: any[];
+//   fabricTaken: boolean;
+//   fabricCode?: string;
+//   fabricPrice?: number;
+// }
 interface ProductOrder {
-  productType: string;
+  product_type: string;
   quantity: number;
   measurements: any[];
   fabricTaken: boolean;
-  fabricCode?: string;
-  fabricPrice?: number;
+  fabric_id?: string;
+  price?: number;
 }
 
 export const OrderForm = ({ onSubmit }: OrderFormProps) => {
@@ -79,11 +88,26 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
   const [activeProductIndex, setActiveProductIndex] = useState(0);
   const [fabricSearchQuery, setFabricSearchQuery] = useState('');
   const [selectedFabric, setSelectedFabric] = useState<any>(null);
+  const [FABRIC_SAMPLES, setFabricsData] = useState([]);
+    
+    useEffect(() => {
+      const fetchProducts = async () => {
+        try {
+          const data = await getProducts();
+          console.log(data)
+          setFabricsData(data.products);
+        } catch (error) {
+          console.error("Error fetching transactions:", error);
+        }
+      };
+    
+      fetchProducts();
+    }, []);
   
   const form = useForm({
     defaultValues: {
       customerName: '',
-      phone: '',
+      // phone: '',
       status: 'Order Taken' as OrderStatus,
     }
   });
@@ -99,9 +123,9 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
   // Calculate total amount whenever products change
   useEffect(() => {
     const calculatedTotal = products.reduce((sum, product) => {
-      const productType = PRODUCT_TYPES.find(type => type.id === product.productType);
+      const productType = PRODUCT_TYPES.find(type => type.id === product.product_type);
       const productPrice = productType ? productType.price * product.quantity : 0;
-      const fabricPrice = product.fabricTaken && product.fabricPrice ? product.fabricPrice : 0;
+      const fabricPrice = product.fabricTaken && product.price ? product.price : 0;
       return sum + productPrice + fabricPrice;
     }, 0);
     
@@ -111,7 +135,7 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
 
   const handleAddProduct = () => {
     setProducts([...products, {
-      productType: '',
+      product_type: '',
       quantity: 1,
       measurements: [],
       fabricTaken: false
@@ -121,7 +145,7 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
 
   const handleProductTypeChange = (productIndex: number, value: string) => {
     const updatedProducts = [...products];
-    updatedProducts[productIndex].productType = value;
+    updatedProducts[productIndex].product_type = value;
     updatedProducts[productIndex].measurements = Array(updatedProducts[productIndex].quantity).fill({});
     setProducts(updatedProducts);
   };
@@ -170,26 +194,26 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
     updatedProducts[productIndex].fabricTaken = value;
     if (!value) {
       // If fabric not taken, clear fabric code and price
-      updatedProducts[productIndex].fabricCode = undefined;
-      updatedProducts[productIndex].fabricPrice = undefined;
+      updatedProducts[productIndex].fabric_id = undefined;
+      updatedProducts[productIndex].price = undefined;
     }
     setProducts(updatedProducts);
   };
 
   const handleFabricCodeSelect = (productIndex: number, fabricCode: string) => {
-    const fabric = FABRIC_SAMPLES.find(f => f.code === fabricCode);
+    const fabric = FABRIC_SAMPLES.find(f => f.fabric_id === fabricCode);
     if (fabric) {
       const updatedProducts = [...products];
-      updatedProducts[productIndex].fabricCode = fabricCode;
-      updatedProducts[productIndex].fabricPrice = fabric.sellingPrice;
+      updatedProducts[productIndex].fabric_id = fabricCode;
+      updatedProducts[productIndex].price = fabric.sellingPrice;
       setProducts(updatedProducts);
       setSelectedFabric(fabric);
     }
   };
 
   const filteredFabrics = FABRIC_SAMPLES.filter(fabric => 
-    fabric.code.toLowerCase().includes(fabricSearchQuery.toLowerCase()) ||
-    fabric.name.toLowerCase().includes(fabricSearchQuery.toLowerCase())
+    fabric.fabric_id.toLowerCase().includes(fabricSearchQuery.toLowerCase()) ||
+    fabric.fabric_name.toLowerCase().includes(fabricSearchQuery.toLowerCase())
   );
 
   const handleSubmit = (formData: any) => {
@@ -212,7 +236,7 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
     }
 
     // Check if all products have a selected product type
-    const hasInvalidProducts = products.some(product => !product.productType);
+    const hasInvalidProducts = products.some(product => !product.product_type);
     if (hasInvalidProducts) {
       toast({
         variant: "destructive",
@@ -226,21 +250,20 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
     const orderId = `ORD-${Math.floor(Math.random() * 900) + 100}`;
     
     const orderData = {
-      id: orderId,
-      customer: {
-        name: formData.customerName,
-        phone: formData.phone,
-      },
+      // id: orderId,
+      customer_id:formData.customerName,
+
+        // phone: formData.phone,
       products: products,
-      orderDate: orderDate.toISOString(),
-      deliveryDate: deliveryDate.toISOString(),
-      status: formData.status,
-      payment: {
-        totalAmount,
-        paidAmount,
-        dueAmount,
+      order_date: orderDate.toISOString(),
+      delivery_date: deliveryDate.toISOString(),
+      order_status: formData.status,
+
+        total_amount:totalAmount,
+        paid_amount:paidAmount,
+        due_amount: dueAmount,
         finalTotalAmount
-      },
+
     };
 
     onSubmit(orderData);
@@ -271,10 +294,10 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
                 name="customerName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Customer Name</FormLabel>
+                    <FormLabel>Customer ID</FormLabel>
                     <FormControl>
                       <Input 
-                        placeholder="Enter customer name" 
+                        placeholder="Enter customer ID" 
                         {...field}
                         required
                       />
@@ -283,7 +306,7 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
                 )}
               />
 
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="phone"
                 render={({ field }) => (
@@ -299,7 +322,7 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
                     </FormControl>
                   </FormItem>
                 )}
-              />
+              /> */}
 
               <FormField
                 control={form.control}
@@ -396,7 +419,7 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
                         <div>
                           <Label>Product Type</Label>
                           <Select 
-                            value={product.productType}
+                            value={product.product_type}
                             onValueChange={(value) => handleProductTypeChange(productIndex, value)}
                           >
                             <SelectTrigger>
@@ -466,8 +489,8 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
                               </thead>
                               <tbody className="bg-white divide-y divide-gray-200">
                                 {filteredFabrics.map((fabric) => (
-                                  <tr key={fabric.code} className={fabric.code === product.fabricCode ? 'bg-blue-50' : ''}>
-                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.code}</td>
+                                  <tr key={fabric.fabric_id} className={fabric.fabric_id === product.fabric_id ? 'bg-blue-50' : ''}>
+                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.fabric_id}</td>
                                     <td className="px-4 py-2 whitespace-nowrap">{fabric.name}</td>
                                     <td className="px-4 py-2 whitespace-nowrap">{fabric.type}</td>
                                     <td className="px-4 py-2 whitespace-nowrap">{fabric.stock}</td>
@@ -477,7 +500,7 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
                                         type="button"
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => handleFabricCodeSelect(productIndex, fabric.code)}
+                                        onClick={() => handleFabricCodeSelect(productIndex, fabric.fabric_id)}
                                       >
                                         Select
                                       </Button>
@@ -488,19 +511,19 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
                             </table>
                           </div>
 
-                          {product.fabricCode && (
+                          {product.fabric_id && (
                             <div className="mt-2">
                               <Label>Selected Fabric</Label>
                               <div className="p-2 bg-white border rounded">
-                                <p className="font-medium">{selectedFabric?.name} ({product.fabricCode})</p>
-                                <p className="text-sm text-gray-600">Price: ৳{product.fabricPrice}</p>
+                                <p className="font-medium">{selectedFabric?.name} ({product.fabric_id})</p>
+                                <p className="text-sm text-gray-600">Price: ৳{product.price}</p>
                               </div>
                             </div>
                           )}
                         </div>
                       )}
 
-                      {product.productType && product.quantity > 0 && (
+                      {product.product_type && product.quantity > 0 && (
                         <div className="space-y-4 mt-4">
                           <h4 className="font-medium">Measurements</h4>
                           
@@ -520,7 +543,7 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
                                 )}
                               </div>
                               <ProductMeasurements
-                                productType={product.productType}
+                                productType={product.product_type}
                                 value={product.measurements[itemIndex]}
                                 onChange={(measurements) => handleMeasurementChange(productIndex, itemIndex, measurements)}
                               />
