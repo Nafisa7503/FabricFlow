@@ -51,11 +51,12 @@ const PRODUCT_TYPES = [
 ];
 
 // Sample fabric data (to be replaced with actual data from database)
-const FABRIC_SAMPLES = [
-  { code: 'FB-001', name: 'Premium Cotton', type: 'Shirting', stock: 15, buyingPrice: 850, sellingPrice: 1000 },
-  { code: 'FB-002', name: 'Italian Wool', type: 'Suiting', stock: 8, buyingPrice: 2400, sellingPrice: 2800 },
-  { code: 'FB-003', name: 'Linen Blend', type: 'Panjabi', stock: 12, buyingPrice: 1200, sellingPrice: 1400 },
-];
+// const FABRIC_SAMPLES = [
+//   { code: 'FB-001', name: 'Premium Cotton', type: 'Shirting', stock: 15, buyingPrice: 850, sellingPrice: 1000 },
+//   { code: 'FB-002', name: 'Italian Wool', type: 'Suiting', stock: 8, buyingPrice: 2400, sellingPrice: 2800 },
+//   { code: 'FB-003', name: 'Linen Blend', type: 'Panjabi', stock: 12, buyingPrice: 1200, sellingPrice: 1400 },
+// ];
+
 
 interface OrderFormProps {
   onSubmit: (data: any) => void;
@@ -81,6 +82,21 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
   const [activeProductIndex, setActiveProductIndex] = useState(0);
   const [fabricSearchQuery, setFabricSearchQuery] = useState('');
   const [selectedFabric, setSelectedFabric] = useState<any>(null);
+  const [FABRIC_SAMPLES, setFabricsData] = useState([]);
+  
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getProducts();
+        console.log(data)
+        setFabricsData(data.products);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+  
+    fetchProducts();
+  }, []);
   
   const form = useForm({
     defaultValues: {
@@ -179,19 +195,19 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
   };
 
   const handleFabricCodeSelect = (productIndex: number, fabricCode: string) => {
-    const fabric = FABRIC_SAMPLES.find(f => f.code === fabricCode);
+    const fabric = FABRIC_SAMPLES.find(f => f.fabric_id === fabricCode);
     if (fabric) {
       const updatedProducts = [...products];
       updatedProducts[productIndex].fabricCode = fabricCode;
-      updatedProducts[productIndex].fabricPrice = fabric.sellingPrice;
+      updatedProducts[productIndex].fabricPrice = fabric.price;
       setProducts(updatedProducts);
       setSelectedFabric(fabric);
     }
   };
 
   const filteredFabrics = FABRIC_SAMPLES.filter(fabric => 
-    fabric.code.toLowerCase().includes(fabricSearchQuery.toLowerCase()) ||
-    fabric.name.toLowerCase().includes(fabricSearchQuery.toLowerCase())
+    fabric.fabric_id.toLowerCase().includes(fabricSearchQuery.toLowerCase()) ||
+    fabric.fabric_name.toLowerCase().includes(fabricSearchQuery.toLowerCase())
   );
 
   const handleSubmit =async (formData: any) => {
@@ -475,18 +491,18 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
                               </thead>
                               <tbody className="bg-white divide-y divide-gray-200">
                                 {filteredFabrics.map((fabric) => (
-                                  <tr key={fabric.code} className={fabric.code === product.fabricCode ? 'bg-blue-50' : ''}>
-                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.code}</td>
-                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.name}</td>
-                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.type}</td>
-                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.stock}</td>
-                                    <td className="px-4 py-2 whitespace-nowrap">৳{fabric.sellingPrice}</td>
+                                  <tr key={fabric.fabric_id} className={fabric.fabric_id === product.fabricCode ? 'bg-blue-50' : ''}>
+                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.fabric_id}</td>
+                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.fabric_name}</td>
+                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.fabric_type}</td>
+                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.quantity}</td>
+                                    <td className="px-4 py-2 whitespace-nowrap">৳{fabric.price}</td>
                                     <td className="px-4 py-2 whitespace-nowrap text-right">
                                       <Button
                                         type="button"
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => handleFabricCodeSelect(productIndex, fabric.code)}
+                                        onClick={() => handleFabricCodeSelect(productIndex, fabric.fabric_id)}
                                       >
                                         Select
                                       </Button>
