@@ -22,7 +22,7 @@ export type Order = {
     name: string;
     phone: string;
   };
-  productType: string;
+  // productType: string;
   orderDate: string;
   deliveryDate: string;
   status: OrderStatus;

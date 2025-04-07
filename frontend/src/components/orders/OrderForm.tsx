@@ -8,6 +8,7 @@ import { OrderStatus, ProductType } from '@/types/orderTypes';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
+import { postOrders} from "../../services/api";
 import { getProducts} from "../../services/api";
 import {
   Popover,
@@ -50,31 +51,23 @@ const PRODUCT_TYPES = [
 ];
 
 // Sample fabric data (to be replaced with actual data from database)
-// const FABRIC_SAMPLES = [
-//   { code: 'FB-001', name: 'Premium Cotton', type: 'Shirting', stock: 15, buyingPrice: 850, sellingPrice: 1000 },
-//   { code: 'FB-002', name: 'Italian Wool', type: 'Suiting', stock: 8, buyingPrice: 2400, sellingPrice: 2800 },
-//   { code: 'FB-003', name: 'Linen Blend', type: 'Panjabi', stock: 12, buyingPrice: 1200, sellingPrice: 1400 },
-// ];
+const FABRIC_SAMPLES = [
+  { code: 'FB-001', name: 'Premium Cotton', type: 'Shirting', stock: 15, buyingPrice: 850, sellingPrice: 1000 },
+  { code: 'FB-002', name: 'Italian Wool', type: 'Suiting', stock: 8, buyingPrice: 2400, sellingPrice: 2800 },
+  { code: 'FB-003', name: 'Linen Blend', type: 'Panjabi', stock: 12, buyingPrice: 1200, sellingPrice: 1400 },
+];
 
 interface OrderFormProps {
   onSubmit: (data: any) => void;
 }
 
-// interface ProductOrder {
-//   productType: string;
-//   quantity: number;
-//   measurements: any[];
-//   fabricTaken: boolean;
-//   fabricCode?: string;
-//   fabricPrice?: number;
-// }
 interface ProductOrder {
-  product_type: string;
+  productType: string;
   quantity: number;
   measurements: any[];
   fabricTaken: boolean;
-  fabric_id?: string;
-  price?: number;
+  fabricCode?: string;
+  fabricPrice?: number;
 }
 
 export const OrderForm = ({ onSubmit }: OrderFormProps) => {
@@ -88,26 +81,11 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
   const [activeProductIndex, setActiveProductIndex] = useState(0);
   const [fabricSearchQuery, setFabricSearchQuery] = useState('');
   const [selectedFabric, setSelectedFabric] = useState<any>(null);
-  const [FABRIC_SAMPLES, setFabricsData] = useState([]);
-    
-    useEffect(() => {
-      const fetchProducts = async () => {
-        try {
-          const data = await getProducts();
-          console.log(data)
-          setFabricsData(data.products);
-        } catch (error) {
-          console.error("Error fetching transactions:", error);
-        }
-      };
-    
-      fetchProducts();
-    }, []);
   
   const form = useForm({
     defaultValues: {
-      customerName: '',
-      // phone: '',
+      customerID: '',
+      phone: '',
       status: 'Order Taken' as OrderStatus,
     }
   });
@@ -123,9 +101,9 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
   // Calculate total amount whenever products change
   useEffect(() => {
     const calculatedTotal = products.reduce((sum, product) => {
-      const productType = PRODUCT_TYPES.find(type => type.id === product.product_type);
+      const productType = PRODUCT_TYPES.find(type => type.id === product.productType);
       const productPrice = productType ? productType.price * product.quantity : 0;
-      const fabricPrice = product.fabricTaken  ? product.price : 0;
+      const fabricPrice = product.fabricTaken && product.fabricPrice ? product.fabricPrice : 0;
       return sum + productPrice + fabricPrice;
     }, 0);
     
@@ -135,7 +113,7 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
 
   const handleAddProduct = () => {
     setProducts([...products, {
-      product_type: '',
+      productType: '',
       quantity: 1,
       measurements: [],
       fabricTaken: false
@@ -145,7 +123,7 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
 
   const handleProductTypeChange = (productIndex: number, value: string) => {
     const updatedProducts = [...products];
-    updatedProducts[productIndex].product_type = value;
+    updatedProducts[productIndex].productType = value;
     updatedProducts[productIndex].measurements = Array(updatedProducts[productIndex].quantity).fill({});
     setProducts(updatedProducts);
   };
@@ -194,29 +172,29 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
     updatedProducts[productIndex].fabricTaken = value;
     if (!value) {
       // If fabric not taken, clear fabric code and price
-      updatedProducts[productIndex].fabric_id = undefined;
-      updatedProducts[productIndex].price = undefined;
+      updatedProducts[productIndex].fabricCode = undefined;
+      updatedProducts[productIndex].fabricPrice = undefined;
     }
     setProducts(updatedProducts);
   };
 
   const handleFabricCodeSelect = (productIndex: number, fabricCode: string) => {
-    const fabric = FABRIC_SAMPLES.find(f => f.fabric_id === fabricCode);
+    const fabric = FABRIC_SAMPLES.find(f => f.code === fabricCode);
     if (fabric) {
       const updatedProducts = [...products];
-      updatedProducts[productIndex].fabric_id = fabricCode;
-      updatedProducts[productIndex].price = fabric.sellingPrice;
+      updatedProducts[productIndex].fabricCode = fabricCode;
+      updatedProducts[productIndex].fabricPrice = fabric.sellingPrice;
       setProducts(updatedProducts);
       setSelectedFabric(fabric);
     }
   };
 
   const filteredFabrics = FABRIC_SAMPLES.filter(fabric => 
-    fabric.fabric_id.toLowerCase().includes(fabricSearchQuery.toLowerCase()) ||
-    fabric.fabric_name.toLowerCase().includes(fabricSearchQuery.toLowerCase())
+    fabric.code.toLowerCase().includes(fabricSearchQuery.toLowerCase()) ||
+    fabric.name.toLowerCase().includes(fabricSearchQuery.toLowerCase())
   );
 
-  const handleSubmit = (formData: any) => {
+  const handleSubmit =async (formData: any) => {
     if (!deliveryDate) {
       toast({
         variant: "destructive",
@@ -236,7 +214,7 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
     }
 
     // Check if all products have a selected product type
-    const hasInvalidProducts = products.some(product => !product.product_type);
+    const hasInvalidProducts = products.some(product => !product.productType);
     if (hasInvalidProducts) {
       toast({
         variant: "destructive",
@@ -247,32 +225,39 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
     }
 
     // Generate a unique order ID (in real app, this would be handled by the backend)
-    const orderId = `ORD-${Math.floor(Math.random() * 900) + 100}`;
+
     
     const orderData = {
-      // id: orderId,
-      customer_id:formData.customerName,
 
-        // phone: formData.phone,
+      customerID: formData.customerID,
+  
       products: products,
-      order_date: orderDate.toISOString(),
-      delivery_date: deliveryDate.toISOString(),
-      order_status: formData.status,
-
-        total_amount:totalAmount,
-        paid_amount:paidAmount,
-        due_amount: dueAmount,
+      orderDate: orderDate.toISOString(),
+      deliveryDate: deliveryDate.toISOString(),
+      status: formData.status,
+      payment: {
+        totalAmount,
+        paidAmount,
+        dueAmount,
         finalTotalAmount
-
+      },
     };
 
-    onSubmit(orderData);
+    try {
+      // Call the postTransactions method to submit the form data
+      await postOrders(orderData);
+      
+
+  
+      onSubmit(orderData);
+
+  
     
-    toast({
-      title: "Order Created",
-      description: `Order ${orderId} has been created successfully.`,
-    });
-  };
+  
+    } catch (error) {
+
+    }
+  }
 
   const generateSlip = (type: 'customer' | 'factory') => {
     toast({
@@ -280,6 +265,7 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
       description: `${type === 'customer' ? 'Customer' : 'Factory'} slip is being generated.`,
     });
     // Implementation for generating PDF would go here
+    
   };
 
   return (
@@ -291,10 +277,10 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
               <h3 className="text-lg font-semibold">Customer Information</h3>
               <FormField
                 control={form.control}
-                name="customerName"
+                name="customerID"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Customer ID</FormLabel>
+                    <FormLabel>Customer Name</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="Enter customer ID" 
@@ -419,7 +405,7 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
                         <div>
                           <Label>Product Type</Label>
                           <Select 
-                            value={product.product_type}
+                            value={product.productType}
                             onValueChange={(value) => handleProductTypeChange(productIndex, value)}
                           >
                             <SelectTrigger>
@@ -489,18 +475,18 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
                               </thead>
                               <tbody className="bg-white divide-y divide-gray-200">
                                 {filteredFabrics.map((fabric) => (
-                                  <tr key={fabric.fabric_id} className={fabric.fabric_id === product.fabric_id ? 'bg-blue-50' : ''}>
-                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.fabric_id}</td>
-                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.fabric_name}</td>
-                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.fabric_type}</td>
-                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.quantity}</td>
-                                    <td className="px-4 py-2 whitespace-nowrap">৳{fabric.price}</td>
+                                  <tr key={fabric.code} className={fabric.code === product.fabricCode ? 'bg-blue-50' : ''}>
+                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.code}</td>
+                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.name}</td>
+                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.type}</td>
+                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.stock}</td>
+                                    <td className="px-4 py-2 whitespace-nowrap">৳{fabric.sellingPrice}</td>
                                     <td className="px-4 py-2 whitespace-nowrap text-right">
                                       <Button
                                         type="button"
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => handleFabricCodeSelect(productIndex, fabric.fabric_id)}
+                                        onClick={() => handleFabricCodeSelect(productIndex, fabric.code)}
                                       >
                                         Select
                                       </Button>
@@ -511,19 +497,19 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
                             </table>
                           </div>
 
-                          {product.fabric_id && (
+                          {product.fabricCode && (
                             <div className="mt-2">
                               <Label>Selected Fabric</Label>
                               <div className="p-2 bg-white border rounded">
-                                <p className="font-medium">{selectedFabric?.fabric_name} ({product.fabric_id})</p>
-                                <p className="text-sm text-gray-600">Price: ৳{selectedFabric?.price}</p>
+                                <p className="font-medium">{selectedFabric?.name} ({product.fabricCode})</p>
+                                <p className="text-sm text-gray-600">Price: ৳{product.fabricPrice}</p>
                               </div>
                             </div>
                           )}
                         </div>
                       )}
 
-                      {product.product_type && product.quantity > 0 && (
+                      {product.productType && product.quantity > 0 && (
                         <div className="space-y-4 mt-4">
                           <h4 className="font-medium">Measurements</h4>
                           
@@ -543,7 +529,7 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
                                 )}
                               </div>
                               <ProductMeasurements
-                                productType={product.product_type}
+                                productType={product.productType}
                                 value={product.measurements[itemIndex]}
                                 onChange={(measurements) => handleMeasurementChange(productIndex, itemIndex, measurements)}
                               />

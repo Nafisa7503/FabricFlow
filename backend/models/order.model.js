@@ -1,58 +1,85 @@
 import mongoose from "mongoose";
 
-const orderSchema = new mongoose.Schema({
-    order_id: {
-        type: String,
-        required: true,
-    },
-    order_date: {
-        type: Date,
-        required: true,
-    },
-    delivery_date: {
-        type: Date,
-        required: true,
-    },
-    customer_id: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "Customer",
-        required: true,
-    },
-    order_status: {
-        type: String,
-        required: true,
-    },
-    product_id: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "Product",
-        required: true,
-    },
-    quantity: {
-        type: Number,
-        required: true,
-    },
-    total_amount: {
-        type: Number,
-        required: true,
-    },
-    paid_amount: {
-        type: Number,
-        required: true,
-    },
-    due_amount: {
-        type: Number,
-        required: true,
-    },
-    total_amount: {
-        type: Number,
-        required: true,
-    },
-    
-   
-   
-},{ timestamps: true}
-);
+const measurementSchema = new mongoose.Schema({
+  neck: String,
+  chest: String,
+  waist: String,
+  shoulder: String,
+  sleeveLength: String,
+  shirtLength: String,
+  cuff: String,
+  notes: String,
+}, { _id: false });
 
-const Order = mongoose.model("Order", orderSchema); //Create a model Transaction from the schema transactionSchema
+const productSchema = new mongoose.Schema({
+  productType: {
+    type: String,
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+  },
+  measurements: [measurementSchema],
+  fabricTaken: {
+    type: Boolean,
+    default: false,
+  },
+  fabricCode: {
+    type: String,
+  },
+  fabricPrice: {
+    type: Number,
+  },
+}, { _id: false });
+
+const paymentSchema = new mongoose.Schema({
+  totalAmount: {
+    type: Number,
+    required: true,
+  },
+  paidAmount: {
+    type: Number,
+    required: true,
+  },
+  dueAmount: {
+    type: Number,
+    required: true,
+  },
+  finalTotalAmount: {
+    type: Number,
+    required: true,
+  },
+}, { _id: false });
+
+const orderSchema = new mongoose.Schema({
+  order_id: {
+    type: String,
+    required: true,
+  },
+  orderDate: {
+    type: Date,
+    required: true,
+  },
+  deliveryDate: {
+    type: Date,
+    required: true,
+  },
+  customer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Customer",
+    required: true,
+  },
+  status: {
+    type: String,
+    default: "Order Taken",
+  },
+  products: [productSchema],
+  payment: paymentSchema,
+}, {
+  timestamps: true
+});
+
+const Order = mongoose.model("Order", orderSchema);
 
 export default Order;

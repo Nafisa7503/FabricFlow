@@ -6,20 +6,20 @@ export const mapLegacyOrdersToNewFormat = (legacyOrders: any[]): Order[] => {
   return legacyOrders.map(order => ({
     id: order.order_id,
     customer: {
-      name: order.customer_id.name,
-      phone: order.customer_id.phone
+      name: order.customer.name,
+      phone: order.customer.phone
     },
-    productType: order.product_id.fabric_type.toLowerCase(),
-    orderDate: order.order_date,
-    deliveryDate: order.delivery_date,
-    status: order.order_status as any,
+    productType: order.products[0].productType.toLowerCase(),
+    orderDate: order.orderDate,
+    deliveryDate: order.deliveryDate,
+    status: order.status as any,
     payment: {
-      totalAmount: order.total_amount,
-      paidAmount: order.paid_amount,
-      pendingAmount: order.due_amount,
-      // finalTotalAmount: order.finalTotalAmount || order.totalAmount // Adding the new field
+      totalAmount: order.payment.totalAmount,
+      paidAmount: order.payment.paidAmount,
+      pendingAmount: order.payment.pendingAmount,
+      finalTotalAmount: order.finalTotalAmount || order.payment.totalAmount // Adding the new field
     },
-    products: order.product_id || [], // Adding support for the new products field
+    products: order.products || [], // Adding support for the new products field
     assignedTo: order.assignedTo || '', // Add assigned employee field
     notes: order.notes || '', // Add notes field
     instructions: order.instructions || '' // Add instructions field

@@ -105,25 +105,24 @@ const Orders = () => {
   const mappedOrders = mapLegacyOrdersToNewFormat(ordersData);
   
   const handleAddOrder = (newOrder: any) => {
-    setOrdersData([
-      {
-        id: `ORD-${Math.floor(Math.random() * 900) + 100}`,
-        ...newOrder,
-      }, 
-      ...ordersData
-    ]);
-    setIsAddingOrder(false);
-    toast({
-      title: t('success'),
-      description: 'Order added successfully',
-    });
+    const fetchOrders = async () => {
+      try {
+        const data = await getOrders();
+        console.log(data)
+        setOrdersData(data.orders);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+  
+    fetchOrders();
   };
   
   // Fixed filtering to safely handle potentially undefined values
   const filteredOrders = ordersData.filter(order => {
-    const customerName = order.customer_id.name || '';
-    const phone = order.customer_id.phone || '';
-    const productType = order.product_id.fabric_type || '';
+    const customerName = order.customer.name || '';
+    const phone = order.customer.phone || '';
+    const productType = order.products.productType || '';
     const id = order.order_id || '';
     const query = searchQuery.toLowerCase();
     
