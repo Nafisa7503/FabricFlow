@@ -9,7 +9,7 @@ import { getNextSequence } from "../utils/getNextSequence.js";
 export const createCustomer = async (req, res) => {
     const customer = req.body;
   
-    if (!customer.name || !customer.phone || !customer.address || !customer.most_purchased) {
+    if (!customer.name || !customer.email || !customer.phone || !customer.address || !customer.most_purchased) {
       return res.status(400).json({ success: false, message: "All fields are required" });
     }
   

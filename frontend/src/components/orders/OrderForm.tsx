@@ -125,7 +125,7 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
     const calculatedTotal = products.reduce((sum, product) => {
       const productType = PRODUCT_TYPES.find(type => type.id === product.product_type);
       const productPrice = productType ? productType.price * product.quantity : 0;
-      const fabricPrice = product.fabricTaken && product.price ? product.price : 0;
+      const fabricPrice = product.fabricTaken  ? product.price : 0;
       return sum + productPrice + fabricPrice;
     }, 0);
     
@@ -491,10 +491,10 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
                                 {filteredFabrics.map((fabric) => (
                                   <tr key={fabric.fabric_id} className={fabric.fabric_id === product.fabric_id ? 'bg-blue-50' : ''}>
                                     <td className="px-4 py-2 whitespace-nowrap">{fabric.fabric_id}</td>
-                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.name}</td>
-                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.type}</td>
-                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.stock}</td>
-                                    <td className="px-4 py-2 whitespace-nowrap">৳{fabric.sellingPrice}</td>
+                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.fabric_name}</td>
+                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.fabric_type}</td>
+                                    <td className="px-4 py-2 whitespace-nowrap">{fabric.quantity}</td>
+                                    <td className="px-4 py-2 whitespace-nowrap">৳{fabric.price}</td>
                                     <td className="px-4 py-2 whitespace-nowrap text-right">
                                       <Button
                                         type="button"
@@ -515,8 +515,8 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
                             <div className="mt-2">
                               <Label>Selected Fabric</Label>
                               <div className="p-2 bg-white border rounded">
-                                <p className="font-medium">{selectedFabric?.name} ({product.fabric_id})</p>
-                                <p className="text-sm text-gray-600">Price: ৳{product.price}</p>
+                                <p className="font-medium">{selectedFabric?.fabric_name} ({product.fabric_id})</p>
+                                <p className="text-sm text-gray-600">Price: ৳{selectedFabric?.price}</p>
                               </div>
                             </div>
                           )}
