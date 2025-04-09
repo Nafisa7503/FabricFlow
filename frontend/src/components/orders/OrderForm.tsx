@@ -296,7 +296,7 @@ export const OrderForm = ({ onSubmit }: OrderFormProps) => {
                 name="customerID"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Customer Name</FormLabel>
+                    <FormLabel>Customer ID</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="Enter customer ID" 

@@ -87,7 +87,7 @@ const InventoryCard = () => {
                   <span className="text-xs text-tailoring-400">/ threshold: 10</span>
                 </div>
               </div>
-              <Button variant="outline" size="sm">Restock</Button>
+              {/* <Button variant="outline" size="sm">Restock</Button> */}
             </div>
           ))}
         </div>
