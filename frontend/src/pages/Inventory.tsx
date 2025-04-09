@@ -7,7 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Search, Plus, Filter, RefreshCcw, Package, Box, Shirt, Scissors, Tag } from 'lucide-react';
 import { InventoryForm } from '@/components/inventory/InventoryForm';
 import { useToast } from '@/hooks/use-toast';
-import { getProducts, updateStock } from "../services/api";
+import { getProducts, updateStock, deleteProduct } from "../services/api";
 // Sample data for fabrics inventory with updated fields
 const initialFabricsData = [
   {
@@ -102,14 +102,28 @@ const Inventory = () => {
     });
   };
 
-  const handleDeleteFabric = (fabricId: string) => {
-    // Confirm deletion
-    if (window.confirm(t('confirmDelete'))) {
-      setFabricsData(prev => prev.filter(fabric => fabric.id !== fabricId));
-      toast({
-        title: t('deleted'),
-        description: `${t('fabric')} ${fabricId} ${t('hasBeenDeleted')}`,
-      });
+  const handleDeleteFabric = async (fabricId: string) => {
+    try {
+      // Confirm deletion
+      if (window.confirm(t('confirmDelete'))) {
+        // Call the deleteProduct method from api.js
+        await deleteProduct(fabricId);
+
+        // Call getProducts() to refresh the product list
+        const data = await getProducts();
+        setFabricsData(data.products);
+
+        // Show a success toast
+        toast({
+          title: t('deleted'),
+          description: `${t('fabric')} ${fabricId} ${t('hasBeenDeleted')}`,
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting fabric:", error);
+
+      // Show an error toast
+
     }
   };
 
@@ -251,7 +265,7 @@ const Inventory = () => {
                               variant="outline" 
                               size="sm"
                               className="text-red-500 hover:text-red-700"
-                              onClick={() => handleDeleteFabric(fabric.id)}
+                              onClick={() => handleDeleteFabric(fabric._id)}
                             >
                               {t('delete')}
                             </Button>

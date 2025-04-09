@@ -96,3 +96,26 @@ export const updateStock = async (req, res) => {
         res.status(500).json({ success: false, message: "Error in updating stock" });
     }
 };
+
+
+export const deleteProduct = async (req, res) => {
+    const { id } = req.params; // Extract product ID from the request parameters
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({ success: false, message: `No product with id: ${id}` });
+    }
+
+    try {
+        // Find and delete the product by ID
+        const deletedProduct = await Product.findByIdAndDelete(id);
+
+        if (!deletedProduct) {
+            return res.status(404).json({ success: false, message: "Product not found" });
+        }
+
+        res.status(200).json({ success: true, message: "Product deleted successfully", product: deletedProduct });
+    } catch (error) {
+        console.log("Error: ", error.message);
+        res.status(500).json({ success: false, message: "Error in deleting product" });
+    }
+};

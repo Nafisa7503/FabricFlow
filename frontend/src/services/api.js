@@ -128,6 +128,25 @@ export const getTransactions = async () => {
     }
   };
 
+  export const deleteProduct = async (productId) => {
+    try {
+      const response = await fetch(`${BASE_URL}/product/${productId}`, {
+        method: "DELETE", // Use DELETE for removing a product
+      });
+  
+      if (!response.ok) {
+        // If the response is not okay (status code outside 2xx range)
+        throw new Error("Failed to delete product");
+      }
+  
+      const data = await response.json();
+      return data; // Return the response data if successful
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      throw error; // Rethrow the error to be caught in the calling function
+    }
+  };
+
   //CUSTOMER APIs
   export const getCustomers = async () => {
     const response = await fetch(`${BASE_URL}/customer`, {
