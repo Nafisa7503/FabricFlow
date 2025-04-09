@@ -1,7 +1,8 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronRight, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { lowInventory } from "../services/api";
 
 // Sample data for inventory items running low
 const lowInventoryData = [
@@ -29,6 +30,22 @@ const lowInventoryData = [
 ];
 
 const InventoryCard = () => {
+  const [inventoryData, setInventoryData] = useState([]);
+
+  useEffect(() => {
+    const fetchInventory = async () => {
+      try {
+        const response = await lowInventory();
+        setInventoryData(response.products);
+      } catch (error) {
+        console.error("Error fetching total customers:", error);
+      }
+    };
+
+    fetchInventory();
+  }, []);
+
+
   return (
     <div className="animate-fade-in-up" style={{ animationDelay: '300ms' }}>
       <div className="bg-white rounded-lg border border-border shadow-subtle p-5">
@@ -53,21 +70,21 @@ const InventoryCard = () => {
         </div>
         
         <div className="space-y-3">
-          {lowInventoryData.map((item) => (
+          {inventoryData.map((item) => (
             <div 
               key={item.id}
               className="p-3 rounded-md border border-border flex justify-between items-center hover:bg-tailoring-50 transition-colors"
             >
               <div>
                 <div className="flex items-center">
-                  <span className="font-medium text-tailoring-900">{item.name}</span>
+                  <span className="font-medium text-tailoring-900">{item.fabric_name}</span>
                   <span className="ml-2 px-2 py-0.5 rounded-full bg-tailoring-100 text-tailoring-700 text-xs">
                     {item.type}
                   </span>
                 </div>
                 <div className="flex items-center mt-1 gap-1">
-                  <span className="text-sm text-red-600 font-medium">{item.available}</span>
-                  <span className="text-xs text-tailoring-400">/ threshold: {item.threshold}</span>
+                  <span className="text-sm text-red-600 font-medium">{item.quantity} pieces</span>
+                  <span className="text-xs text-tailoring-400">/ threshold: 10</span>
                 </div>
               </div>
               <Button variant="outline" size="sm">Restock</Button>

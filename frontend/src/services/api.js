@@ -63,6 +63,15 @@ export const getTransactions = async () => {
     return data;
   };
 
+
+  export const lowInventory = async () => {
+    const response = await fetch(`${BASE_URL}/product/inventory`, {
+      method: "GET",
+    });
+    const data = await response.json();
+    return data;
+  };
+
   export const postProducts = async (productData) => {
     try {
       console.log("This works")
