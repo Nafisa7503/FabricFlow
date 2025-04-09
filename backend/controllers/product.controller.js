@@ -29,20 +29,6 @@ export const createProduct =async (req,res) => {
 }
 
 
-// export const deleteProducts = async (req,res) => {
-//     const {id} = req.params;
-
-//     if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({message:`No product with id: ${id}`});
-//     try{
-//         await Product.findByIdAndDelete(id);
-//         res.status(201).json({success: true, message: "Product deleted successfully"});
-
-//     } catch (error) {
-//         console.log("Error: ", error.message);
-//         res.status(500).json({success: false, message: "Update failed"});
-//     }
-// }
-
 
 export const getProducts = async (req,res) => {
 
@@ -58,16 +44,13 @@ export const getProducts = async (req,res) => {
 
 
 
-// export const updateProducts = async (req,res) => { //put is used to update all the data, patch is used to update some data
-//     const {id} = req.params;
-//     const product = req.body;
-//     if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({message:`No product with id: ${id}`});
-//     try{
-//         const updatedProduct =await Product.findByIdAndUpdate(id,product, {new: true});
-//         res.status(201).json({success: true, message: "Product deleted successfully", product: updatedProduct});
-
-//     } catch (error) {
-//         console.log("Error: ", error.message);
-//         res.status(500).json({success: false, message: "Server Error"});
-//     }
-// }
+export const totalProducts = async (req, res) => {
+    try {
+        // Count the total number of products in the database
+        const total = await Product.countDocuments({});
+        res.status(200).json({ success: true, totalProducts: total });
+    } catch (error) {
+        console.log("Error: ", error.message);
+        res.status(500).json({ success: false, message: "Error in fetching total products" });
+    }
+};

@@ -70,7 +70,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-8">
           <RecentOrders />
-          <PendingDeliveriesList orders={ordersDatabase} />
+          <PendingDeliveriesList />
         </div>
         <div className="space-y-8">
           <InventoryCard />

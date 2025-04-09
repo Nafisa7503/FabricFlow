@@ -118,6 +118,21 @@ export const pendingOrders = async (req, res) => {
 };
 
 
+export const newOrders = async (req, res) => {
+    try {
+        // Count the total number of orders where the status is not "Delivered"
+        const totalOrders = await Order.countDocuments({
+            status: { $ne: "Delivered" }
+        });
+
+        res.status(200).json({ success: true, totalOrders });
+    } catch (error) {
+        console.log("Error: ", error.message);
+        res.status(500).json({ success: false, message: "Error in fetching new orders" });
+    }
+};
+
+
 // export const updateProducts = async (req,res) => { //put is used to update all the data, patch is used to update some data
 //     const {id} = req.params;
 //     const product = req.body;

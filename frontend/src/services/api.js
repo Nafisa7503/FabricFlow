@@ -15,6 +15,14 @@ export const getTransactions = async () => {
     return data;
   };
 
+  export const totalIncome = async () => {
+    const response = await fetch(`${BASE_URL}/transaction/income`, {
+      method: "GET",
+    });
+    const data = await response.json();
+    return data;
+  };
+
   export const postTransactions = async (transactionData) => {
     try {
       const response = await fetch(`${BASE_URL}/transaction`, {
@@ -41,6 +49,14 @@ export const getTransactions = async () => {
   //PRODUCT APIs
   export const getProducts = async () => {
     const response = await fetch(`${BASE_URL}/product`, {
+      method: "GET",
+    });
+    const data = await response.json();
+    return data;
+  };
+
+  export const totalProducts = async () => {
+    const response = await fetch(`${BASE_URL}/product/total`, {
       method: "GET",
     });
     const data = await response.json();
@@ -75,6 +91,14 @@ export const getTransactions = async () => {
   //CUSTOMER APIs
   export const getCustomers = async () => {
     const response = await fetch(`${BASE_URL}/customer`, {
+      method: "GET",
+    });
+    const data = await response.json();
+    return data;
+  };
+
+  export const totalCustomers = async () => {
+    const response = await fetch(`${BASE_URL}/customer/total`, {
       method: "GET",
     });
     const data = await response.json();
@@ -119,6 +143,14 @@ export const getTransactions = async () => {
 
   export const recentOrders = async () => {
     const response = await fetch(`${BASE_URL}/order/recent`, {
+      method: "GET",
+    });
+    const data = await response.json();
+    return data;
+  };
+
+  export const newOrders = async () => {
+    const response = await fetch(`${BASE_URL}/order/new`, {  //returns number of orders in last month
       method: "GET",
     });
     const data = await response.json();

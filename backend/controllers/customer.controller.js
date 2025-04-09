@@ -31,6 +31,17 @@ export const createCustomer = async (req, res) => {
       res.status(500).json({ success: false, message: "Server error. Please try again." });
     }
   };
+
+  export const totalCustomer = async (req, res) => {
+    try {
+        // Count the total number of customers in the database
+        const total = await Customer.countDocuments({});
+        res.status(200).json({ success: true, totalCustomers: total });
+    } catch (error) {
+        console.log("Error: ", error.message);
+        res.status(500).json({ success: false, message: "Error in fetching total customers" });
+    }
+};
   
 
 export const getCustomer = async (req,res) => {
