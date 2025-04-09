@@ -117,6 +117,22 @@ export const getTransactions = async () => {
     return data;
   };
 
+  export const recentOrders = async () => {
+    const response = await fetch(`${BASE_URL}/order/recent`, {
+      method: "GET",
+    });
+    const data = await response.json();
+    return data;
+  };
+
+  export const pendingOrders = async () => {
+    const response = await fetch(`${BASE_URL}/order/pending`, {
+      method: "GET",
+    });
+    const data = await response.json();
+    return data;
+  };
+
   export const postOrders = async (orderData) => {
     try {
       console.log("This works")

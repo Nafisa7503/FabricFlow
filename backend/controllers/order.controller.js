@@ -86,6 +86,38 @@ export const getOrders = async (req, res) => {
 };
 
 
+export const recentOrders = async (req, res) => {
+    try {
+        // Find the last 5 orders, sorted by createdAt in descending order
+        const orders = await Order.find({})
+            .sort({ createdAt: -1 }) // Sort by createdAt in descending order
+            .limit(5) // Limit the result to the last 5 orders
+            .populate("customer"); // Fetch customer details
+
+        res.status(200).json({ success: true, orders: orders });
+    } catch (error) {
+        console.log("Error: ", error.message);
+        res.status(500).json({ success: false, message: "Error in fetching recent orders" });
+    }
+};
+
+
+export const pendingOrders = async (req, res) => {
+    try {
+        // Find the 4 most recent orders where the status is not "delivered"
+        const orders = await Order.find({ status: { $ne: "Delivered" } })
+            .sort({ createdAt: -1 }) // Sort by createdAt in descending order
+            .limit(4) // Limit the result to the 4 most recent orders
+            .populate("customer"); // Fetch customer details
+
+        res.status(200).json({ success: true, orders: orders });
+    } catch (error) {
+        console.log("Error: ", error.message);
+        res.status(500).json({ success: false, message: "Error in fetching pending orders" });
+    }
+};
+
+
 // export const updateProducts = async (req,res) => { //put is used to update all the data, patch is used to update some data
 //     const {id} = req.params;
 //     const product = req.body;

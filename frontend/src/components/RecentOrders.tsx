@@ -1,7 +1,8 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronRight, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { recentOrders} from "../services/api";
 
 // Sample data for recent orders
 const recentOrdersData = [
@@ -55,14 +56,14 @@ const StatusBadge = ({ status }: { status: string }) => {
     case 'Ready for Pickup':
       color = 'bg-green-100 text-green-800';
       break;
-    case 'Final Fitting':
+    case 'Order Taken':
       color = 'bg-blue-100 text-blue-800';
       break;
-    case 'Stitching':
+    case 'Sent to Factory':
       color = 'bg-yellow-100 text-yellow-800';
       break;
-    case 'Cutting':
-      color = 'bg-orange-100 text-orange-800';
+    case 'Delivered':
+      color = 'bg-green-100 text-green-800';
       break;
     case 'Measurement Taken':
       color = 'bg-purple-100 text-purple-800';
@@ -79,6 +80,21 @@ const StatusBadge = ({ status }: { status: string }) => {
 };
 
 const RecentOrders = () => {
+  const [recentOrdersData, setOrdersData] = useState([]);
+
+   useEffect(() => {
+      const fetchOrders = async () => {
+        try {
+          const data = await recentOrders();
+          console.log(data)
+          setOrdersData(data.orders);
+        } catch (error) {
+          console.error("Error fetching transactions:", error);
+        }
+      };
+    
+      fetchOrders();
+    }, []);
   return (
     <div className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
       <div className="flex items-center justify-between mb-4">
@@ -111,17 +127,17 @@ const RecentOrders = () => {
           </thead>
           <tbody>
             {recentOrdersData.map((order) => (
-              <tr key={order.id}>
-                <td className="font-medium text-tailoring-900">{order.id}</td>
-                <td>{order.customer}</td>
-                <td>{order.product}</td>
-                <td>{new Date(order.date).toLocaleDateString('en-US', { 
+              <tr key={order.order_id}>
+                <td className="font-medium text-tailoring-900">{order.order_id}</td>
+                <td>{order.customer.name}</td>
+                <td>{order.products[0].productType}</td>
+                <td>{new Date(order.orderDate).toLocaleDateString('en-US', { 
                   year: 'numeric', 
                   month: 'short', 
                   day: 'numeric' 
                 })}</td>
                 <td><StatusBadge status={order.status} /></td>
-                <td>{order.amount}</td>
+                <td>{order.payment.totalAmount}</td>
                 <td>
                   <Button variant="ghost" size="icon" className="text-tailoring-500 hover:text-tailoring-900">
                     <ExternalLink className="h-4 w-4" />

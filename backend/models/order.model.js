@@ -9,6 +9,14 @@ const measurementSchema = new mongoose.Schema({
   shirtLength: String,
   cuff: String,
   notes: String,
+  hip: String,
+  thigh: String,
+  length: String,
+  inseam: String,
+  knee: String,
+  bottom: String,
+
+
 }, { _id: false });
 
 const productSchema = new mongoose.Schema({

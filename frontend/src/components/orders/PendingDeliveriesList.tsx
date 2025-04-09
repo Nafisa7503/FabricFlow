@@ -4,17 +4,29 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { sortPendingDeliveries } from '@/utils/orderUtils';
 import { Order } from '@/types/orderTypes';
 import { format } from 'date-fns';
+import { pendingOrders} from "../../services/api";
+
 
 interface PendingDeliveriesListProps {
   orders: Order[];
 }
 
-const PendingDeliveriesList = ({ orders }: PendingDeliveriesListProps) => {
-  const [pendingDeliveries, setPendingDeliveries] = useState<Order[]>([]);
+const PendingDeliveriesList = ( )=> {
+  const [pendingDeliveries, setPendingDeliveries] = useState([]);
   
   useEffect(() => {
-    setPendingDeliveries(sortPendingDeliveries(orders));
-  }, [orders]);
+    const fetchOrders = async () => {
+      try {
+        const data = await pendingOrders();
+        console.log(data)
+        setPendingDeliveries(data.orders);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+  
+    fetchOrders();
+  }, []);
 
   return (
     <Card>
@@ -31,7 +43,7 @@ const PendingDeliveriesList = ({ orders }: PendingDeliveriesListProps) => {
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="font-medium">{order.customer.name}</p>
-                    <p className="text-sm text-muted-foreground">{order.id}</p>
+                    <p className="text-sm text-muted-foreground">{order.order_id}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm">Delivery on</p>
@@ -39,7 +51,7 @@ const PendingDeliveriesList = ({ orders }: PendingDeliveriesListProps) => {
                   </div>
                 </div>
                 <div className="flex justify-between mt-2 text-sm">
-                  <span>{order.productType}</span>
+                  <span>{order.products[0].productType}</span>
                   <span className={
                     order.status === 'Ready for Pickup' 
                       ? 'text-green-600' 
