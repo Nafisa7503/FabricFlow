@@ -40,7 +40,7 @@ const Dashboard = () => {
           </Card>
           
           <div className="flex flex-wrap gap-4">
-            <Card className="p-4 flex items-center gap-3 dark:bg-tailoring-900 shadow-sm hover:shadow-md transition-all duration-200">
+            {/* <Card className="p-4 flex items-center gap-3 dark:bg-tailoring-900 shadow-sm hover:shadow-md transition-all duration-200">
               <div className="p-2 rounded-full bg-green-100 dark:bg-green-900">
                 <ArrowUp className="h-4 w-4 text-green-600 dark:text-green-400" />
               </div>
@@ -48,9 +48,9 @@ const Dashboard = () => {
                 <p className="text-sm text-tailoring-600 dark:text-tailoring-400">{t('dailySales')}</p>
                 <p className="font-medium text-tailoring-900 dark:text-white">৳12,450</p>
               </div>
-            </Card>
+            </Card> */}
             
-            <Card className="p-4 flex items-center gap-3 dark:bg-tailoring-900 shadow-sm hover:shadow-md transition-all duration-200">
+            {/* <Card className="p-4 flex items-center gap-3 dark:bg-tailoring-900 shadow-sm hover:shadow-md transition-all duration-200">
               <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900">
                 <ArrowDown className="h-4 w-4 text-amber-600 dark:text-amber-400" />
               </div>
@@ -58,7 +58,7 @@ const Dashboard = () => {
                 <p className="text-sm text-tailoring-600 dark:text-tailoring-400">{t('dailyExpenses')}</p>
                 <p className="font-medium text-tailoring-900 dark:text-white">৳4,250</p>
               </div>
-            </Card>
+            </Card> */}
           </div>
         </div>
       </div>
@@ -70,11 +70,11 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-8">
           <RecentOrders />
-          <PendingDeliveriesList orders={ordersDatabase} />
+          <PendingDeliveriesList />
         </div>
         <div className="space-y-8">
           <InventoryCard />
-          <CustomerCard />
+          {/* <CustomerCard /> */}
         </div>
       </div>
     </div>

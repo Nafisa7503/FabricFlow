@@ -1,6 +1,7 @@
-
+import { useState, useEffect } from 'react';
 import { CreditCard, Users, ShoppingBag, TrendingUp, Box } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { totalCustomers,totalIncome, totalProducts, newOrders } from "../services/api";
 
 interface StatCardProps {
   title: string;
@@ -27,7 +28,7 @@ const StatCard = ({ title, value, icon, trend, delay = 0 }: StatCardProps) => {
       </div>
       <div className="flex flex-col">
         <h3 className="text-2xl font-bold text-tailoring-900 dark:text-white">{value}</h3>
-        {trend && (
+        {/* {trend && (
           <div className="flex items-center mt-1">
             <div className={`text-xs font-medium flex items-center ${
               trend.positive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
@@ -39,7 +40,7 @@ const StatCard = ({ title, value, icon, trend, delay = 0 }: StatCardProps) => {
             </div>
             <span className="text-xs text-tailoring-400 dark:text-tailoring-500 ml-1">vs last month</span>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
@@ -47,33 +48,90 @@ const StatCard = ({ title, value, icon, trend, delay = 0 }: StatCardProps) => {
 
 const Stats = () => {
   const { t } = useLanguage();
-  
+  const [customerCount, setCustomerCount] = useState<number | null>(null);
+  const [totalSale, settotalSale] = useState<number | null>(null);
+  const [newOrder, setnewOrder] = useState<number | null>(null);
+  const [totalProduct, settotalProduct] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchTotalCustomers = async () => {
+      try {
+        const response = await totalCustomers();
+        setCustomerCount(response.totalCustomers);
+      } catch (error) {
+        console.error("Error fetching total customers:", error);
+      }
+    };
+
+    fetchTotalCustomers();
+  }, []);
+
+
+  useEffect(() => {
+    const fetchTotalIncome = async () => {
+      try {
+        const response = await totalIncome();
+        settotalSale(response.totalIncome);
+      } catch (error) {
+        console.error("Error fetching total customers:", error);
+      }
+    };
+
+    fetchTotalIncome();
+  }, []);
+
+  useEffect(() => {
+    const fetchNewOrders = async () => {
+      try {
+        const response = await newOrders();
+        setnewOrder(response.totalOrders);
+      } catch (error) {
+        console.error("Error fetching new orders:", error);
+      }
+    };
+
+    fetchNewOrders();
+  }, []);
+
+  useEffect(() => {
+    const fetchTotalProducts = async () => {
+      try {
+        const response = await totalProducts();
+        settotalProduct(response.totalProducts);
+      } catch (error) {
+        console.error("Error fetching total products:", error);
+      }
+    };
+
+    fetchTotalProducts();
+  }, []); 
+
   return (
     <div className="dashboard-grid">
       <StatCard 
         title={t('totalSales')} 
-        value="৳65,400" 
+        value={`৳${totalSale !== null ? totalSale.toString() : "Loading..."}`} 
         icon={<CreditCard className="h-5 w-5" />} 
         trend={{ value: "12%", positive: true }}
         delay={100}
       />
       <StatCard 
         title={t('totalCustomers')} 
-        value="243" 
+        value={customerCount !== null ? customerCount.toString() : "Loading..."} 
         icon={<Users className="h-5 w-5" />} 
         trend={{ value: "5%", positive: true }}
         delay={200}
       />
       <StatCard 
         title={t('newOrders')} 
-        value="36" 
+        value={newOrder !== null ? newOrder.toString() : "Loading..."} 
         icon={<ShoppingBag className="h-5 w-5" />} 
         trend={{ value: "2%", positive: false }}
         delay={300}
       />
       <StatCard 
         title={t('inventoryItems')} 
-        value="182" 
+        value={totalProduct !== null ? totalProduct.toString() : "Loading..."} 
         icon={<Box className="h-5 w-5" />}
         delay={400}
       />

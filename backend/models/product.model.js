@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
+    fabric_id: {
+        type: String,
+        required: true,
+    },
     fabric_name: {
         type: String,
         required: true,

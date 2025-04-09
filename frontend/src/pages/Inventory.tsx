@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Search, Plus, Filter, RefreshCcw, Package, Box, Shirt, Scissors, Tag } from 'lucide-react';
 import { InventoryForm } from '@/components/inventory/InventoryForm';
 import { useToast } from '@/hooks/use-toast';
-import { getProducts} from "../services/api";
+import { getProducts, updateStock, deleteProduct } from "../services/api";
 // Sample data for fabrics inventory with updated fields
 const initialFabricsData = [
   {
@@ -103,30 +102,51 @@ const Inventory = () => {
     });
   };
 
-  const handleDeleteFabric = (fabricId: string) => {
-    // Confirm deletion
-    if (window.confirm(t('confirmDelete'))) {
-      setFabricsData(prev => prev.filter(fabric => fabric.id !== fabricId));
-      toast({
-        title: t('deleted'),
-        description: `${t('fabric')} ${fabricId} ${t('hasBeenDeleted')}`,
-      });
+  const handleDeleteFabric = async (fabricId: string) => {
+    try {
+      // Confirm deletion
+      if (window.confirm(t('confirmDelete'))) {
+        // Call the deleteProduct method from api.js
+        await deleteProduct(fabricId);
+
+        // Call getProducts() to refresh the product list
+        const data = await getProducts();
+        setFabricsData(data.products);
+
+        // Show a success toast
+        toast({
+          title: t('deleted'),
+          description: `${t('fabric')} ${fabricId} ${t('hasBeenDeleted')}`,
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting fabric:", error);
+
+      // Show an error toast
+
     }
   };
 
-  const handleUpdateStock = (fabricId: string, newStock: number) => {
-    setFabricsData(prev => 
-      prev.map(fabric => 
-        fabric.id === fabricId 
-          ? { ...fabric, available: newStock } 
-          : fabric
-      )
-    );
-    
-    toast({
-      title: t('stockUpdated'),
-      description: `${t('fabric')} ${fabricId} ${t('stockUpdatedTo')} ${newStock}`,
-    });
+  const handleUpdateStock = async (fabricId: string, newStock: number) => {
+    try {
+      // Call the updateStock method from api.js
+      await updateStock(fabricId, { quantity: newStock });
+
+      // Call getProducts() to refresh the product list
+      const data = await getProducts();
+      setFabricsData(data.products);
+
+      // Show a success toast
+      toast({
+        title: t('stockUpdated'),
+        description: `${t('fabric')} ${fabricId} ${t('stockUpdatedTo')} ${newStock}`,
+      });
+    } catch (error) {
+      console.error("Error updating stock:", error);
+
+      // Show an error toast
+
+    }
   };
   
   const filteredFabrics = fabricsData.filter((fabric) => 
@@ -201,7 +221,7 @@ const Inventory = () => {
                 <table className="data-table">
                   <thead>
                     <tr>
-                      {/* <th>ID</th> */}
+                      <th>ID</th>
                       <th>{('Name')}</th>
                       <th>{('Type')}</th>
                       <th>{('Color')}</th>
@@ -217,7 +237,7 @@ const Inventory = () => {
                   <tbody>
                     {filteredFabrics.map((fabric) => (
                       <tr key={fabric.id}>
-                        {/* <td className="font-medium text-tailoring-900">{fabric.id}</td> */}
+                        <td className="font-medium text-tailoring-900">{fabric.fabric_id}</td>
                         <td>{fabric.fabric_name}</td>
                         <td>{fabric.fabric_type}</td>
                         <td>{fabric.color}</td>
@@ -230,22 +250,22 @@ const Inventory = () => {
                             <Button 
                               variant="outline" 
                               size="sm"
-                              onClick={() => handleUpdateStock(fabric.id, fabric.available + 1)}
+                              onClick={() => handleUpdateStock(fabric._id, fabric.available + 1)}
                             >
                               {t('addStock')}
                             </Button>
-                            <Button 
+                            {/* <Button 
                               variant="outline" 
                               size="sm"
                               onClick={() => handleEditFabric(fabric.id)}
                             >
                               {t('edit')}
-                            </Button>
+                            </Button> */}
                             <Button 
                               variant="outline" 
                               size="sm"
                               className="text-red-500 hover:text-red-700"
-                              onClick={() => handleDeleteFabric(fabric.id)}
+                              onClick={() => handleDeleteFabric(fabric._id)}
                             >
                               {t('delete')}
                             </Button>

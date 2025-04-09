@@ -4,20 +4,20 @@ import { Order, ProductType } from '@/types/orderTypes';
 // This function converts legacy order data to the new Order format
 export const mapLegacyOrdersToNewFormat = (legacyOrders: any[]): Order[] => {
   return legacyOrders.map(order => ({
-    id: order.id,
+    id: order.order_id,
     customer: {
-      name: order.customerName,
-      phone: order.phone
+      name: order.customer.name,
+      phone: order.customer.phone
     },
-    productType: order.product_id.fabric_type.toLowerCase(),
+    productType: order.products[0].productType.toLowerCase(),
     orderDate: order.orderDate,
     deliveryDate: order.deliveryDate,
     status: order.status as any,
     payment: {
-      totalAmount: order.totalAmount,
-      paidAmount: order.paidAmount,
-      pendingAmount: order.pendingAmount,
-      finalTotalAmount: order.finalTotalAmount || order.totalAmount // Adding the new field
+      totalAmount: order.payment.totalAmount,
+      paidAmount: order.payment.paidAmount,
+      pendingAmount: order.payment.pendingAmount,
+      finalTotalAmount: order.finalTotalAmount || order.payment.totalAmount // Adding the new field
     },
     products: order.products || [], // Adding support for the new products field
     assignedTo: order.assignedTo || '', // Add assigned employee field

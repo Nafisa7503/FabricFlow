@@ -140,10 +140,10 @@ const CustomerCard = ({
             <p className="font-semibold text-tailoring-900">{customer.totalSpent}</p>
           </div>
         </div>
-        <div className="mt-3">
+        {/* <div className="mt-3">
           <p className="text-xs text-tailoring-500">{t('favoriteProducts')}</p>
           <p className="text-sm font-medium text-tailoring-700">{customer.favorite}</p>
-        </div>
+        </div> */}
         <div className="mt-3 flex gap-2">
           <Button 
             size="sm" 
@@ -174,7 +174,7 @@ useEffect(() => {
     try {
       const data = await getCustomers();
       console.log(data)
-      setCustomersData(data.customer);
+      setCustomersData(data.customers);
     } catch (error) {
       console.error("Error fetching transactions:", error);
     }
@@ -186,7 +186,7 @@ useEffect(() => {
     try {
       const data = await getCustomers();
       console.log(data)
-      setCustomersData(data.customer);
+      setCustomersData(data.customers);
     } catch (error) {
       console.error("Error fetching transactions:", error);
     }
@@ -285,7 +285,7 @@ useEffect(() => {
                   <th>{t('lastPurchase')}</th>
                   <th>{t('orders')}</th>
                   <th>{t('totalSpent')}</th>
-                  <th>{t('preferences')}</th>
+                  {/* <th>{t('preferences')}</th> */}
                   <th></th>
                 </tr>
               </thead>
@@ -299,14 +299,10 @@ useEffect(() => {
                       <div className="text-tailoring-500">{customer.email}</div>
                     </td>
                     <td>{customer.address}</td>
-                    <td>{new Date(customer.lastPurchase).toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'short', 
-                      day: 'numeric' 
-                    })}</td>
+                    <td>{customer.lastOrderedProduct}</td>
                     <td className="text-center">{customer.totalOrders}</td>
                     <td>{customer.totalSpent}</td>
-                    <td>{customer.favorite}</td>
+                    <td></td>
                     <td>
                       <div className="flex gap-2">
                         <Button 

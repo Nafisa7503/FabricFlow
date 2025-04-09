@@ -1,10 +1,9 @@
-
 import { useState,useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getTransactions} from "../services/api";
+import { getTransactions,expenseBreakdown} from "../services/api";
 import { 
   Search, 
   Plus, 
@@ -69,6 +68,7 @@ const Finance = () => {
   const [isAddingTransaction, setIsAddingTransaction] = useState(false);
   // const [transactionsData, setTransactionsData] = useState(initialTransactionsData);
   const [transactionsData, setTransactionsData] = useState([]);
+  const [pieChartData, setExpenseData] = useState([]);
 
 useEffect(() => {
   const fetchTransactions = async () => {
@@ -82,6 +82,20 @@ useEffect(() => {
   };
 
   fetchTransactions();
+}, []);
+
+useEffect(() => {
+  const fetchExpense = async () => {
+    try {
+      const data = await expenseBreakdown();
+      console.log(data)
+      setExpenseData(data.pieChartData);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+    }
+  };
+
+  fetchExpense();
 }, []);
 
 const handleAddTransaction = async (newTransaction: any) => {
@@ -183,10 +197,10 @@ const handleAddTransaction = async (newTransaction: any) => {
               <BarChart3 className="h-4 w-4" />
               {t('reports') || 'Reports'}
             </TabsTrigger>
-            <TabsTrigger value="accounts" className="flex items-center gap-2">
+            {/* <TabsTrigger value="accounts" className="flex items-center gap-2">
               <Wallet className="h-4 w-4" />
               {t('accounts') || 'Accounts'}
-            </TabsTrigger>
+            </TabsTrigger> */}
           </TabsList>
           
           <TabsContent value="transactions" className="animate-fade-in">
@@ -221,7 +235,7 @@ const handleAddTransaction = async (newTransaction: any) => {
               <table className="data-table">
                 <thead>
                   <tr>
-                    {/* <th>ID</th> */}
+                    <th>ID</th>
                     <th>{t('transactionDate')}</th>
                     <th>{t('description')}</th>
                     <th>{t('category')}</th>
@@ -233,7 +247,7 @@ const handleAddTransaction = async (newTransaction: any) => {
                 <tbody>
                   {filteredTransactions.map((transaction) => (
                     <tr key={transaction.id}>
-                      {/* <td className="font-medium text-tailoring-900">{transaction.id}</td> */}
+                      <td className="font-medium text-tailoring-900">{transaction.transaction_id}</td>
                       <td>{new Date(transaction.createdAt).toLocaleDateString('en-US', { 
                         year: 'numeric', 
                         month: 'short', 
@@ -266,8 +280,8 @@ const handleAddTransaction = async (newTransaction: any) => {
                     <PieChart>
                       <Pie
                         data={pieChartData}
-                        cx="50%"
-                        cy="50%"
+                        cx="50%" // Center horizontally
+                        cy="50%" // Center vertically
                         outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
@@ -284,7 +298,7 @@ const handleAddTransaction = async (newTransaction: any) => {
                 </div>
               </div>
               
-              <div className="bg-white rounded-lg border border-border shadow-subtle p-5">
+              {/* <div className="bg-white rounded-lg border border-border shadow-subtle p-5">
                 <h3 className="text-lg font-semibold text-tailoring-900 mb-6">{t('weekly') || 'Weekly'} {t('financialPerformance') || 'Financial Performance'}</h3>
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
@@ -299,7 +313,7 @@ const handleAddTransaction = async (newTransaction: any) => {
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-              </div>
+              </div> */}
             </div>
           </TabsContent>
           
