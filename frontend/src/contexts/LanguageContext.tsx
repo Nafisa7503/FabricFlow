@@ -215,7 +215,7 @@ const translations: Record<'en' | 'bn', Record<TranslationKey, string>> = {
     totalCustomers: 'Total Customers',
     newOrders: 'New Orders',
     inventoryItems: 'Inventory Items',
-    welcome: 'Welcome back to Pentagon - weave your style!',
+    welcome: 'Welcome back to Fabric Flow - weave your style!',
     cancel: 'Cancel',
     confirm: 'Confirm',
     error: 'Error',
