@@ -15,6 +15,14 @@ export const getTransactions = async () => {
     return data;
   };
 
+  export const expenseBreakdown = async () => {
+    const response = await fetch(`${BASE_URL}/transaction/expense`, {
+      method: "GET",
+    });
+    const data = await response.json();
+    return data;
+  };
+
   export const totalIncome = async () => {
     const response = await fetch(`${BASE_URL}/transaction/income`, {
       method: "GET",
@@ -96,6 +104,29 @@ export const getTransactions = async () => {
       throw error; // Rethrow the error to be caught in the form submission handler
     }
   }; 
+
+  export const updateStock = async (productId, updatedData) => {
+    try {
+      const response = await fetch(`${BASE_URL}/product/update/${productId}`, {
+        method: "PUT", // Use PUT for updating the stock
+        headers: {
+          "Content-Type": "application/json", // Ensure the content type is JSON
+        },
+        body: JSON.stringify(updatedData), // Send the updated stock data in the request body
+      });
+  
+      if (!response.ok) {
+        // If the response is not okay (status code outside 2xx range)
+        throw new Error("Failed to update stock");
+      }
+  
+      const data = await response.json();
+      return data; // Return the response data if successful
+    } catch (error) {
+      console.error("Error updating stock:", error);
+      throw error; // Rethrow the error to be caught in the calling function
+    }
+  };
 
   //CUSTOMER APIs
   export const getCustomers = async () => {
@@ -197,4 +228,4 @@ export const getTransactions = async () => {
       console.error("Error posting transaction:", error);
       throw error; // Rethrow the error to be caught in the form submission handler
     }
-  }; 
+  };

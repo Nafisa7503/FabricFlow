@@ -60,3 +60,38 @@ export const totalIncome = async (req, res) => {
         res.status(500).json({ success: false, message: "Error in fetching total income" });
     }
 };
+
+
+export const expenseBreakdown = async (req, res) => {
+    try {
+        // Aggregate transactions with type "expense", group by category, and sum their amounts
+        const expenses = await Transaction.aggregate([
+            { $match: { type: "expense" } }, // Filter transactions with type "expense"
+            { $group: { _id: "$category", totalAmount: { $sum: "$amount" } } } // Group by category and sum amounts
+        ]);
+
+        // Map the aggregated data to the pie chart format
+        const pieChartData = expenses.map((expense) => {
+            return {
+                name: expense._id, // Category name (e.g., Sales, Salary, etc.)
+                value: expense.totalAmount, // Total amount for the category
+                color: getRandomColor(), // Assign a random color
+            };
+        });
+
+        res.status(200).json({ success: true, pieChartData });
+    } catch (error) {
+        console.log("Error: ", error.message);
+        res.status(500).json({ success: false, message: "Error in fetching expense breakdown" });
+    }
+};
+
+// Helper function to generate random colors
+const getRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+};
