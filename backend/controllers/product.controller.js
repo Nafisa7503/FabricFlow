@@ -61,7 +61,7 @@ export const lowInventory = async (req, res) => {
         // Find the products with quantity less than 10, sort them in ascending order, and limit to 3
         const products = await Product.find({ quantity: { $lt: 10 } }) // Filter products with quantity < 10
             .sort({ quantity: 1 }) // Sort by quantity in ascending order
-            .limit(3); // Limit the result to 3 products
+            .limit(10); // Limit the result to 3 products
 
         res.status(200).json({ success: true, products });
     } catch (error) {

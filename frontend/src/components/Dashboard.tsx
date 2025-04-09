@@ -74,7 +74,7 @@ const Dashboard = () => {
         </div>
         <div className="space-y-8">
           <InventoryCard />
-          <CustomerCard />
+          {/* <CustomerCard /> */}
         </div>
       </div>
     </div>
