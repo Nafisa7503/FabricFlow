@@ -3,8 +3,7 @@ import mongoose from "mongoose";
 import Customer from "../models/customer.model.js";
 import Counter from "../models/counter.model.js";
 import { getNextSequence } from "../utils/getNextSequence.js";
-
-
+import Order from "../models/order.model.js";
 
 export const createCustomer = async (req, res) => {
     const customer = req.body;
@@ -44,17 +43,47 @@ export const createCustomer = async (req, res) => {
 };
   
 
-export const getCustomer = async (req,res) => {
-
+export const getCustomer = async (req, res) => {
     try {
-        const customer = await Customer.find({});
-        res.status(201).json({success: true, customer: customer});
+        // Retrieve all customers
+        const customers = await Customer.find({});
 
+        // For each customer, calculate the required details
+        const customerDetails = await Promise.all(
+            customers.map(async (customer) => {
+                // Fetch all orders for the customer
+                const orders = await Order.find({ customer: customer._id }).sort({ orderDate: -1 });
+
+                // Calculate total spent (sum of paidAmount in all orders)
+                const totalSpent = orders.reduce((sum, order) => sum + order.payment.paidAmount, 0);
+
+                // Get the date of the last purchase (from the most recent order)
+                const lastOrder = orders[0];
+                const lastPurchase = lastOrder ? lastOrder.orderDate : "N/A";
+
+                // Total number of orders
+                const totalOrders = orders.length;
+
+                return {
+                    customer_id: customer.customer_id,
+                    name: customer.name,
+                    email: customer.email,
+                    phone: customer.phone,
+                    address: customer.address,
+                    most_purchased: customer.most_purchased,
+                    lastPurchase,
+                    totalSpent,
+                    totalOrders,
+                };
+            })
+        );
+
+        res.status(200).json({ success: true, customers: customerDetails });
     } catch (error) {
         console.log("Error: ", error.message);
-        res.status(404).json({success: false, message: "Error in fetching Products"}); 
-}
-}
+        res.status(500).json({ success: false, message: "Error in fetching customer details" });
+    }
+};
 
 
 // export const deleteProducts = async (req,res) => {

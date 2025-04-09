@@ -213,7 +213,7 @@ const translations: Record<'en' | 'bn', Record<TranslationKey, string>> = {
     dailyExpenses: 'Daily Expenses',
     totalSales: 'Total Sales',
     totalCustomers: 'Total Customers',
-    newOrders: 'Active Orders',
+    newOrders: 'New Orders',
     inventoryItems: 'Inventory Items',
     welcome: 'Welcome back to Pentagon - weave your style!',
     cancel: 'Cancel',
